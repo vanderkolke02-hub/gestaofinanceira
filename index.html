@@ -697,36 +697,72 @@
       font-family:inherit;font-size:11px;padding:4px 8px;border-radius:5px;cursor:pointer;}
 
     /* RESPONSIVIDADE MOBILE */
+    /* ── RESPONSIVIDADE ── */
     @media (max-width: 992px) {
       .main-grid { grid-template-columns: 1fr; }
       .right-col { grid-column: 1; grid-row: auto; }
       .heatmap-panel { grid-column: 1; }
       .sub-kpis { grid-template-columns: repeat(2, 1fr); }
       .cat-aba-donut-row { grid-template-columns: 1fr; }
+      .cartoes-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 768px) {
-      .topnav { height: auto; flex-direction: column; padding: 10px; gap: 10px; }
-      .nav-links { width: 100%; overflow-x: auto; justify-content: flex-start; -webkit-overflow-scrolling: touch; }
-      .nav-links a { height: 36px; padding: 0 12px; white-space: nowrap; }
+      html,body { font-size: 12px; }
+      .topnav { height: auto; flex-direction: column; padding: 8px 12px; gap: 8px; }
+      .nav-links { width: 100%; overflow-x: auto; justify-content: flex-start; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      .nav-links::-webkit-scrollbar { display: none; }
+      .nav-links a { height: 36px; padding: 0 10px; white-space: nowrap; font-size: 12px; }
       .nav-spacer { display: none; }
       .nav-actions { width: 100%; justify-content: flex-end; }
-      .kpi-strip { grid-template-columns: 1fr; }
-      .upload-banner { flex-direction: column; align-items: flex-start; }
+      .brand-badge { font-size: 11px; padding: 5px 10px; }
+      .kpi-strip { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .kpi { padding: 10px 12px; gap: 10px; }
+      .kpi-val { font-size: 16px; }
+      .upload-banner { flex-direction: column; align-items: flex-start; gap: 10px; }
       .upload-input-wrap { width: 100%; }
       .upload-btn { width: 100%; justify-content: center; }
-      .hm-header-row { flex-direction: column; gap: 12px; }
-      .hm-header-stats { flex-wrap: wrap; gap: 14px; }
+      .hm-header-row { flex-direction: column; gap: 10px; }
+      .hm-header-stats { flex-wrap: wrap; gap: 10px; }
       .hm-month-nav { width: 100%; justify-content: space-between; }
-      .table-actions { flex-direction: column; align-items: stretch; }
+      .hm-total { font-size: 18px; }
+      .filter-row { gap: 6px; }
+      .filter-select { font-size: 11px; padding: 5px 8px; }
+      .table-actions { flex-direction: column; align-items: stretch; gap: 8px; }
       .search-input { width: 100%; }
       .add-tx-btn { width: 100%; text-align: center; }
-      .modal-card { margin: 10px; padding: 16px; }
+      .sub-kpis { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .mini-val { font-size: 14px; }
+      .tx-table-panel { padding: 8px; }
+      .tx-table th, .tx-table td { padding: 8px 6px; font-size: 11px; }
+      .tx-table th:nth-child(3), .tx-table td:nth-child(3),
+      .tx-table th:nth-child(4), .tx-table td:nth-child(4) { display: none; }
+      .modal-card { margin: 8px; padding: 14px; border-radius: 12px; }
       .modal-grid-2 { grid-template-columns: 1fr; }
+      .modal-title { font-size: 16px; }
+      .cat-aba-hero { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .cat-aba-hero-val { font-size: 24px; }
+      .cat-group-header { padding: 10px 12px; gap: 8px; }
+      .cat-group-amount { font-size: 12px; }
+      .cartoes-hero-total { font-size: 32px; }
+      .cartao-card { padding: 14px; }
+      .tx-drawer { width: 100%; border-left: none; border-top: 1px solid rgba(255,255,255,0.08); border-radius: 16px 16px 0 0; top: auto; bottom: 0; height: 90vh; transform: translateY(100%); }
+      .tx-drawer.open { transform: translateY(0); }
+      .pagination-container { flex-direction: column; gap: 8px; align-items: center; }
+      .drp-panel { width: 100vw; left: -16px; }
+      .drp-calendars { flex-direction: column; padding: 10px; }
+      .drp-cal + .drp-cal { margin-left: 0; padding-left: 0; border-left: none; border-top: 1px solid rgba(255,255,255,.06); padding-top: 12px; margin-top: 12px; }
     }
     @media (max-width: 480px) {
-      .sub-kpis { grid-template-columns: 1fr; }
+      .kpi-strip { grid-template-columns: 1fr; }
+      .sub-kpis { grid-template-columns: 1fr 1fr; }
       .doughnut-wrap { flex-direction: column; align-items: center; }
       .hm-bottom { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .kpi-val { font-size: 15px; }
+    }
+    @media (max-width: 375px) {
+      .app { padding: 8px; gap: 8px; }
+      .nav-links a { padding: 0 8px; font-size: 11px; }
+      .brand-badge .ver { font-size: 15px; }
     }
 
     /* ── GOOGLE DRIVE SYNC ── */
@@ -1094,7 +1130,7 @@
         <option value="maior">Maior Valor</option>
       </select>
       <select class="filter-select" id="filtroCategoria" onchange="resetarPaginaEFiltrar()">
-        <option value="todas">Categorias</option>
+        <option value="todas">Categorias Macro</option>
       </select>
       <div class="toggle-wrap">
         <input type="checkbox" id="mostrarOcultos" onchange="resetarPaginaEFiltrar()">
@@ -1123,6 +1159,7 @@
 
     <div class="table-actions">
       <input type="text" class="search-input" id="searchTx" placeholder="Buscar transações..." oninput="resetarPaginaEFiltrar()">
+      <button class="add-tx-btn" onclick="limparFiltros()" style="border-color:rgba(14,165,233,0.3);color:var(--accent2)">✕ Limpar filtros</button>
       <button class="add-tx-btn" onclick="abrirModalTransacao()">+ Nova Transação</button>
     </div>
 
@@ -1133,6 +1170,7 @@
             <th style="width: 40px;">#</th>
             <th>Descrição</th>
             <th>Categoria</th>
+            <th>Subcategoria</th>
             <th>Forma de Pagto.</th>
             <th>Conta</th>
             <th>Data</th>
@@ -1141,7 +1179,7 @@
           </tr>
         </thead>
         <tbody id="txTableBody">
-          <tr><td colspan="8" style="text-align:center; color:var(--muted); padding: 30px;">Nenhum lançamento carregado.</td></tr>
+          <tr><td colspan="9" style="text-align:center; color:var(--muted); padding: 30px;">Nenhum lançamento carregado.</td></tr>
         </tbody>
       </table>
       
@@ -1218,6 +1256,23 @@
       </div>
     </div>
   </div>
+  <!-- MODAL NOVA CATEGORIA -->
+  <div class="modal-overlay" id="novaCatModal" style="z-index:9600">
+    <div class="modal-card" style="max-width:380px">
+      <div class="modal-title">Nova Categoria</div>
+      <div class="modal-subtitle">Crie um novo grupo de categorias para organizar seus lançamentos.</div>
+      <div class="modal-group" style="margin-bottom:20px">
+        <input type="text" id="novaCatInput" class="modal-input" placeholder="Ex: Pets, Viagens, Educação..."
+          onkeydown="if(event.key==='Enter')salvarNovaCategoria()">
+      </div>
+      <div id="novaCatErro" style="font-size:11px;color:var(--danger);margin-bottom:8px;display:none"></div>
+      <div class="modal-actions">
+        <button class="modal-btn-cancel" onclick="fecharNovaCategoriaModal()">Cancelar</button>
+        <button class="modal-btn-submit" onclick="salvarNovaCategoria()">Criar Categoria</button>
+      </div>
+    </div>
+  </div>
+
   <div id="tab-lancamentos" class="tab-content">
     <!-- HERO TOTAL -->
     <div class="cat-aba-hero">
@@ -1284,15 +1339,38 @@
       </div>
     </div>
 
-    <div class="modal-group" style="margin-bottom: 16px;">
-      <input type="text" id="mDesc" class="modal-input" placeholder="Descrição da transação" style="padding-bottom: 40px;">
-    </div>
-
     <div class="modal-grid-2">
-      <div class="modal-group">
+      <div class="modal-group" style="position:relative">
         <span class="modal-label-floating">Categoria</span>
-        <input type="text" id="mCategoria" class="modal-input" placeholder="Alimentação, Aluguel...">
+        <!-- dropdown de busca igual ao drawer -->
+        <div id="mMacroWrap" style="position:relative">
+          <button id="mMacroTrigger" type="button" onclick="mMacroToggle()"
+            style="width:100%;background:#050b14;border:1px solid rgba(255,255,255,0.08);color:var(--text);
+                   padding:12px;border-radius:10px;font-family:inherit;font-size:13px;cursor:pointer;
+                   display:flex;justify-content:space-between;align-items:center;text-align:left">
+            <span id="mMacroLabel" style="color:var(--muted)">Alimentação, Moradia, Lazer...</span>
+            <span style="color:var(--muted);font-size:10px">▼</span>
+          </button>
+          <div id="mMacroPanel" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;
+               background:#0d1f3c;border:1px solid rgba(255,255,255,0.1);border-radius:10px;
+               box-shadow:0 16px 48px rgba(0,0,0,.6);z-index:600;overflow:hidden">
+            <div style="padding:8px">
+              <input id="mMacroSearch" placeholder="Buscar ou digitar nova categoria..."
+                style="width:100%;background:#050b14;border:1px solid rgba(255,255,255,0.08);color:var(--text);
+                       padding:8px 10px;border-radius:7px;font-family:inherit;font-size:12px;outline:none"
+                oninput="mMacroFilter()"
+                onkeydown="mMacroKeydown(event)">
+            </div>
+            <div id="mMacroList" style="max-height:160px;overflow-y:auto;padding:4px 6px 8px"></div>
+          </div>
+        </div>
       </div>
+      <div class="modal-group">
+        <span class="modal-label-floating">Descrição</span>
+        <input type="text" id="mCategoria" class="modal-input" placeholder="Netflix, Aluguel, Uber...">
+      </div>
+    </div>
+    <div class="modal-grid-2">
       <div class="modal-group">
         <span class="modal-label-floating">Tipo</span>
         <select id="mTipo" class="modal-input" onchange="atualizarModalBadge()" style="cursor: pointer; appearance: none;">
@@ -1535,9 +1613,15 @@ function popularFiltrosDinamicos() {
     fConta.innerHTML += `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`;
   });
 
-  fCat.innerHTML = '<option value="todas">Categorias</option>';
-  const todasCats = new Set(ALL_ROWS.map(r => r.categoria));
-  Array.from(todasCats).sort().forEach(c => {
+  fCat.innerHTML = '<option value="todas">Categorias Macro</option>';
+  const todasCatsMacro = new Set(
+    ALL_ROWS.map(r => {
+      const v = r.categoriaMacro;
+      if (v && !CAT_MACRO_BLOCKLIST.has(v.toLowerCase().trim())) return v;
+      return getCatGroup(r.categoria);
+    }).filter(Boolean)
+  );
+  Array.from(todasCatsMacro).sort().forEach(c => {
     fCat.innerHTML += `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`;
   });
 
@@ -1717,8 +1801,9 @@ function renderContasETop() {
     totalConsolidado += cSaldo;
     const pct = (Math.abs(cSaldo) / maxC) * 100;
     const cor = cSaldo < 0 ? 'var(--danger)' : 'var(--accent2)';
+    const safeNome = escapeHTML(cNome).replace(/'/g, "\\'");
     divContas.innerHTML += `
-      <div class="account-row">
+      <div class="account-row" onclick="irParaLancamentosConta('${safeNome}')" style="cursor:pointer" title="Ver lançamentos de ${escapeHTML(cNome)}">
         <div class="account-meta">
           <span class="account-name">${escapeHTML(cNome)}</span>
           <span class="account-val" style="color:${cor}">${money(cSaldo)}</span>
@@ -1845,13 +1930,11 @@ function hmRender() {
         if (obj && (obj.receita > 0 || obj.despesa > 0)) {
           cell.classList.add('has-val');
           if (obj.saldo > 0) {
-            const op = Math.min(0.1 + (obj.saldo / (tRec || 1)) * 2, 0.9);
-            cell.style.background = `rgba(0, 200, 150, ${op})`;
-            cell.style.color = op > 0.5 ? '#071120' : 'var(--text)';
+            cell.style.background = 'rgba(0, 200, 150, 0.25)';
+            cell.style.color = 'var(--accent)';
           } else if (obj.saldo < 0) {
-            const op = Math.min(0.1 + (Math.abs(obj.saldo) / (tDesp || 1)) * 2, 0.9);
-            cell.style.background = `rgba(244, 63, 94, ${op})`;
-            cell.style.color = op > 0.5 ? '#fff' : 'var(--text)';
+            cell.style.background = 'rgba(244, 63, 94, 0.25)';
+            cell.style.color = '#fff';
           } else {
             cell.style.background = 'rgba(255,255,255,0.06)';
           }
@@ -1935,36 +2018,45 @@ document.getElementById('csvFileInput')?.addEventListener('change', function(e) 
         return;
       }
 
-      const mappings = {
-        descricao: ['Descrição', 'Descricao', 'description', 'Details'],
-        categoria: ['Categoria', 'Category', 'Grupo'],
-        forma: ['Forma de Pagamento', 'Forma Pagamento', 'Forma', 'Payment Method', 'Meio de Pagamento'],
-        conta: ['Conta', 'Account', 'Origem'],
-        data: ['Data', 'Date', 'Data do Lançamento'],
-        valor: ['Valor', 'Amount', 'Valor (R$)']
+      // ── Mapeamento de colunas do CSV ──
+      const colAliases = {
+        descricao:     ['SubCategoria','Subcategoria','Sub Categoria','Descrição','Descricao','description','Details'],
+        categoriaMacro:['Categoria','Category','Grupo'],
+        forma:         ['Forma de Pagamento','Forma Pagamento','Forma','Payment Method','Meio de Pagamento'],
+        conta:         ['Conta','Account','Origem'],
+        numConta:      ['NumConta','Num Conta','Numero Conta','num_conta'],
+        data:          ['Data','Date','Data do Lançamento'],
+        valor:         ['Valor','Amount','Valor (R$)'],
+        tipo:          ['Tipo','Type','Natureza']
       };
 
       const keys = Object.keys(d[0]);
-      const findKey = arr => keys.find(k => arr.includes(k.trim()));
+      const findKey = arr => keys.find(k => arr.map(a=>a.toLowerCase()).includes(k.trim().toLowerCase()));
 
-      const mapDesc = findKey(mappings.descricao) || keys[0];
-      const mapCat = findKey(mappings.categoria) || keys[1];
-      const mapForma = findKey(mappings.forma) || keys[2];
-      const mapConta = findKey(mappings.conta) || keys[3];
-      const mapData = findKey(mappings.data) || keys[4];
-      const mapValor = findKey(mappings.valor) || keys[5];
+      const mapDesc      = findKey(colAliases.descricao)      || keys[0];
+      const mapCatMacro  = findKey(colAliases.categoriaMacro) || null;
+      const mapForma     = findKey(colAliases.forma)          || null;
+      const mapConta     = findKey(colAliases.conta)          || null;
+      const mapNumConta  = findKey(colAliases.numConta)       || null;
+      const mapData      = findKey(colAliases.data)           || null;
+      const mapValor     = findKey(colAliases.valor)          || null;
+      const mapTipo      = findKey(colAliases.tipo)           || null;
 
-      const tipoChave = keys.find(k => ['tipo', 'type', 'natureza'].includes(k.toLowerCase().trim()));
+      // Índice de categorias já conhecidas por descrição (auto-sugestão #0)
+      const catByDesc = {};
+      ALL_ROWS.forEach(r => {
+        if (r.categoriaMacro) catByDesc[r.descricao.toLowerCase()] = r.categoriaMacro;
+      });
 
       const novasLinhas = [];
       d.forEach(row => {
-        let vRaw = row[mapValor];
+        const vRaw = mapValor ? row[mapValor] : null;
         if (!vRaw) return;
-        
+
         let t = 'despesa';
-        if (tipoChave && row[tipoChave]) {
-          const valTipo = String(row[tipoChave]).toLowerCase();
-          if (valTipo.includes('rec') || valTipo.includes('ent') || valTipo.includes('cré') || valTipo.includes('incom')) t = 'receita';
+        if (mapTipo && row[mapTipo]) {
+          const valTipo = String(row[mapTipo]).toLowerCase();
+          if (valTipo.includes('rec') || valTipo.includes('ent') || valTipo.includes('cré') || valTipo.includes('créd') || valTipo.includes('incom')) t = 'receita';
         } else {
           if (String(vRaw).includes('+')) t = 'receita';
         }
@@ -1972,32 +2064,49 @@ document.getElementById('csvFileInput')?.addEventListener('change', function(e) 
         const vNum = parseBRL(vRaw);
         if (vNum === 0) return;
 
-        let dStr = String(row[mapData]).trim();
-        let dtParsed = parseDate(dStr);
-        let dtIso = dtParsed ? dtParsed.toISOString().slice(0, 10) : new Date().toISOString().slice(0,10);
+        const dStr     = mapData ? String(row[mapData]).trim() : '';
+        const dtParsed = parseDate(dStr);
+        const dtIso    = dtParsed ? dtParsed.toISOString().slice(0, 10) : new Date().toISOString().slice(0,10);
+
+        const descricao       = (mapDesc     ? row[mapDesc]     : '') || 'Sem descrição';
+        const catMacroCSV     = mapCatMacro  ? (row[mapCatMacro] || '').trim() : '';
+        const catAutoSugerida = catByDesc[descricao.toLowerCase()] || '';
+        const categoriaMacroFinal = catMacroCSV || catAutoSugerida || 'Genérica';
+        const categoriaFinal      = descricao;  // subcategoria = descrição importada
 
         novasLinhas.push({
-          id: 'csv-' + Math.random().toString(36).substr(2, 9),
-          descricao: row[mapDesc] || 'Sem descrição',
-          categoria: row[mapCat] || 'Geral',
-          forma: row[mapForma] || 'Não informada',
-          conta: row[mapConta] || 'Principal',
-          data: dtIso,
-          valor: vNum,
-          tipo: t,
-          oculto: false
+          id:             'csv-' + Math.random().toString(36).substr(2, 9),
+          descricao:      descricao,
+          categoria:      categoriaFinal,
+          categoriaMacro: categoriaMacroFinal,
+          forma:          (mapForma    ? row[mapForma]    : '') || 'Não informada',
+          conta:          (mapConta    ? row[mapConta]    : '') || 'Principal',
+          numConta:       (mapNumConta ? row[mapNumConta] : '') || '',
+          data:           dtIso,
+          valor:          vNum,
+          tipo:           t,
+          oculto:         false
         });
       });
 
       if (novasLinhas.length > 0) {
-        ALL_ROWS = novasLinhas;
+        // MODO MESCLAR (#9): preserva dados existentes, insere apenas novos
+        const existingSet = new Set(
+          ALL_ROWS.map(r => [r.data, String(r.valor), r.descricao.toLowerCase(), r.conta].join('|'))
+        );
+        const verdadeiramenteNovas = novasLinhas.filter(r =>
+          !existingSet.has([r.data, String(r.valor), r.descricao.toLowerCase(), r.conta].join('|'))
+        );
+        const duplicadas = novasLinhas.length - verdadeiramenteNovas.length;
+        ALL_ROWS = [...ALL_ROWS, ...verdadeiramenteNovas];
         recalcularEstruturas();
         
         setStoredRows(ALL_ROWS).then(() => {
           const banner = document.getElementById('uploadBanner');
           if(banner) banner.classList.add('loaded');
           if(sub) {
-            sub.textContent = '✓ Base carregada com sucesso — ' + ALL_ROWS.length.toLocaleString('pt-BR') + ' linhas salvas no IndexedDB';
+            const msgDup = duplicadas > 0 ? ` (${duplicadas} duplicatas ignoradas)` : '';
+            sub.textContent = `✓ ${verdadeiramenteNovas.length.toLocaleString('pt-BR')} novos lançamentos importados · total: ${ALL_ROWS.length.toLocaleString('pt-BR')}${msgDup}`;
             sub.classList.add('ok');
           }
           csvLoaded = true;
@@ -2062,6 +2171,22 @@ function resetarPaginaEFiltrar() {
   filtrarTabela();
 }
 
+function limparFiltros() {
+  document.getElementById('searchTx').value = '';
+  document.getElementById('filtroConta').value = 'todas';
+  document.getElementById('filtroTipo').value = 'todas';
+  document.getElementById('filtroOrdenacao').value = 'recentes';
+  document.getElementById('filtroCategoria').value = 'todas';
+  document.getElementById('mostrarOcultos').checked = false;
+  drpStart = null; drpEnd = null; drpPickStart = null; drpPickEnd = null;
+  drpUpdateBtn();
+  document.querySelectorAll('.drp-sc-btn').forEach(b => b.classList.remove('active'));
+  const t = document.getElementById('drpSc-todos');
+  if (t) t.classList.add('active');
+  paginaAtual = 1;
+  filtrarTabela();
+}
+
 function mudarTamanhoPagina() {
   itensPorPagina = parseInt(document.getElementById('pageSizeSelect').value, 10) || 10;
   resetarPaginaEFiltrar();
@@ -2088,7 +2213,12 @@ function filtrarTabela() {
     }
 
     if (fConta !== 'todas' && r.conta !== fConta) return false;
-    if (fCat !== 'todas' && r.categoria !== fCat) return false;
+    if (fCat !== 'todas') {
+      const macroEfetivo = (r.categoriaMacro && !CAT_MACRO_BLOCKLIST.has(r.categoriaMacro.toLowerCase().trim()))
+        ? r.categoriaMacro
+        : getCatGroup(r.categoria);
+      if (macroEfetivo !== fCat) return false;
+    }
 
     if (fTipo === 'rec' && r.tipo !== 'receita') return false;
     if (fTipo === 'desp' && r.tipo !== 'despesa') return false;
@@ -2139,7 +2269,7 @@ function renderizarPaginaTabela() {
 
   const totalItens = linhasFiltradas.length;
   if (totalItens === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--muted); padding: 30px;">Nenhum lançamento corresponde aos filtros.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--muted); padding: 30px;">Nenhum lançamento corresponde aos filtros.</td></tr>';
     document.getElementById('pageInfoLabel').textContent = 'Mostrando 0 a 0 de 0';
     document.getElementById('pageNavButtons').innerHTML = '';
     return;
@@ -2169,7 +2299,8 @@ function renderizarPaginaTabela() {
       <tr class="tx-row" style="${trStyle}" onclick="abrirDrawerDetalhe('${r.id}', event)" style="cursor:pointer">
         <td style="color: var(--muted); font-weight:600; padding-left:12px;">${numLinha}</td>
         <td style="font-weight: 500;">${escapeHTML(r.descricao)}</td>
-        <td><span class="badge-cat">${escapeHTML(r.categoria)}</span></td>
+        <td><span class="badge-cat" style="background:rgba(14,165,233,0.1);color:var(--accent2)">${escapeHTML(r.categoriaMacro || getCatGroup(r.categoria))}</span></td>
+        <td><span class="badge-cat">${escapeHTML(r.categoria !== r.descricao ? r.categoria : '—')}</span></td>
         <td style="color: var(--text2);">${escapeHTML(r.forma)}</td>
         <td>
           <div class="badge-account">
@@ -2488,11 +2619,19 @@ function selecionarCategoria(cat) {
 }
 
 // ── DROPDOWN CATEGORIA MACRO ──
+// Valores que não devem aparecer como opção de categoria macro
+const CAT_MACRO_BLOCKLIST = new Set(['generica','genérica','sem categoria','outros','other','']);
+
 function getCategoriasmacro() {
-  const fromRows = new Set(ALL_ROWS.map(r => r.categoriaMacro).filter(Boolean));
   const fromDefault = new Set(Object.keys(CAT_DEFAULT_GROUPS));
-  const fromComputed = new Set(ALL_ROWS.map(r => getCatGroup(r.categoria)));
-  return Array.from(new Set([...fromDefault, ...fromRows, ...fromComputed])).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  const fromCustom  = new Set(CUSTOM_CATEGORIES);
+  const fromManual  = new Set(Object.keys(CAT_MAP).filter(k => k.startsWith('__custom__')).map(k => CAT_MAP[k]));
+  // Só inclui categoriaMacro dos rows se for um valor "limpo" (não é descrição longa, não está na blocklist)
+  const fromRows = new Set(
+    ALL_ROWS.map(r => r.categoriaMacro)
+      .filter(v => v && !CAT_MACRO_BLOCKLIST.has(v.toLowerCase().trim()) && v.length <= 40 && !v.match(/\d{2}\/\d{2}|\d{4}/))
+  );
+  return Array.from(new Set([...fromDefault, ...fromRows, ...fromCustom, ...fromManual])).sort((a, b) => a.localeCompare(b, 'pt-BR'));
 }
 
 function renderMacroList(macroAtual, filtro) {
@@ -2617,13 +2756,93 @@ document.addEventListener('click', function(e) {
 function abrirModalTransacao() {
   document.getElementById('mData').value = new Date().toLocaleDateString('pt-BR');
   document.getElementById('mValor').value = '';
-  document.getElementById('mDesc').value = '';
   document.getElementById('mCategoria').value = '';
   document.getElementById('mForma').value = '';
   document.getElementById('mTipo').value = 'despesa';
+  // reset do dropdown de categoria macro
+  const lbl = document.getElementById('mMacroLabel');
+  if (lbl) { lbl.textContent = 'Alimentação, Moradia, Lazer...'; lbl.style.color = 'var(--muted)'; }
+  const panel = document.getElementById('mMacroPanel');
+  if (panel) panel.style.display = 'none';
   atualizarModalBadge();
   document.getElementById('txModal').classList.add('active');
 }
+
+// ── DROPDOWN CATEGORIA MACRO — MODAL NOVA TRANSAÇÃO ──
+let mMacroOpen = false;
+
+function mMacroToggle() {
+  const panel = document.getElementById('mMacroPanel');
+  if (!panel) return;
+  mMacroOpen = panel.style.display !== 'none' ? false : true;
+  panel.style.display = mMacroOpen ? 'block' : 'none';
+  if (mMacroOpen) {
+    const s = document.getElementById('mMacroSearch');
+    if (s) { s.value = ''; s.focus(); }
+    mMacroRenderList('');
+  }
+}
+
+function mMacroRenderList(termo) {
+  const list = document.getElementById('mMacroList');
+  if (!list) return;
+  const cats = getCategoriasmacro();
+  const t = termo.trim().toLowerCase();
+  const filtradas = t ? cats.filter(c => c.toLowerCase().includes(t)) : cats;
+  const currentLbl = (document.getElementById('mMacroLabel') || {}).textContent || '';
+  let html = '';
+  if (filtradas.length > 0) {
+    html += `<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:4px 6px 2px">Categorias disponíveis</div>`;
+    filtradas.forEach(c => {
+      const icon = CAT_ICONS[c] || '📦';
+      const active = c === currentLbl ? 'background:rgba(0,200,150,0.15);color:var(--accent);' : '';
+      html += `<div onclick="mMacroSelect('${escapeHTML(c).replace(/'/g,"\\'")}');event.stopPropagation()"
+        style="padding:7px 10px;border-radius:6px;cursor:pointer;font-size:12px;${active}">${icon} ${escapeHTML(c)}</div>`;
+    });
+  }
+  const termoBruto = termo.trim();
+  const exato = cats.some(c => c.toLowerCase() === termoBruto.toLowerCase());
+  if (termoBruto && !exato) {
+    html += `<div onclick="mMacroSelect('${escapeHTML(termoBruto).replace(/'/g,"\\'")}');event.stopPropagation()"
+      style="padding:7px 10px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--accent2)">+ Criar "${escapeHTML(termoBruto)}"</div>`;
+  }
+  if (!html) html = `<div style="padding:8px 10px;font-size:11px;color:var(--muted)">Nenhuma categoria encontrada.</div>`;
+  list.innerHTML = html;
+}
+
+function mMacroFilter() {
+  const s = document.getElementById('mMacroSearch');
+  if (s) mMacroRenderList(s.value);
+}
+
+function mMacroKeydown(e) {
+  if (e.key === 'Enter') {
+    const t = e.target.value.trim();
+    if (t) mMacroSelect(t);
+  }
+  if (e.key === 'Escape') {
+    const panel = document.getElementById('mMacroPanel');
+    if (panel) panel.style.display = 'none';
+    mMacroOpen = false;
+  }
+}
+
+function mMacroSelect(cat) {
+  const lbl = document.getElementById('mMacroLabel');
+  if (lbl) { lbl.textContent = cat; lbl.style.color = 'var(--text)'; }
+  const panel = document.getElementById('mMacroPanel');
+  if (panel) panel.style.display = 'none';
+  mMacroOpen = false;
+}
+
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('mMacroWrap');
+  if (mMacroOpen && wrap && !wrap.contains(e.target)) {
+    const panel = document.getElementById('mMacroPanel');
+    if (panel) panel.style.display = 'none';
+    mMacroOpen = false;
+  }
+});
 
 function fecharModalTransacao() {
   document.getElementById('txModal').classList.remove('active');
@@ -2644,8 +2863,13 @@ function atualizarModalBadge() {
 function salvarTransacaoManual() {
   const conta = document.getElementById('mConta').value.trim() || 'Principal';
   const vRaw = document.getElementById('mValor').value;
-  const desc = document.getElementById('mDesc').value.trim() || 'Lançamento Manual';
-  const cat = document.getElementById('mCategoria').value.trim() || 'Geral';
+  const cat = document.getElementById('mCategoria').value.trim();
+  const macroLbl = document.getElementById('mMacroLabel');
+  const catMacroRaw = macroLbl ? macroLbl.textContent.trim() : '';
+  const catMacroPlaceholder = 'Alimentação, Moradia, Lazer...';
+  const catMacro = (catMacroRaw && catMacroRaw !== catMacroPlaceholder) ? catMacroRaw : 'Genérica';
+  // descrição: usa o campo "Descrição" (antigo subcategoria); fallback para categoria macro
+  const desc = cat || catMacro || 'Lançamento Manual';
   const tipo = document.getElementById('mTipo').value;
   const dataRaw = document.getElementById('mData').value.trim();
   const forma = document.getElementById('mForma').value.trim() || 'Outros';
@@ -2664,15 +2888,17 @@ function salvarTransacaoManual() {
   const dataIso = pDt.toISOString().slice(0, 10);
 
   const novoItem = {
-    id: 'man-' + Math.random().toString(36).substr(2, 9),
-    descricao: desc,
-    categoria: cat,
-    forma: forma,
-    conta: conta,
-    data: dataIso,
-    valor: valor,
-    tipo: tipo,
-    oculto: false
+    id:             'man-' + Math.random().toString(36).substr(2, 9),
+    descricao:      desc,
+    categoria:      cat || desc,
+    categoriaMacro: catMacro,
+    forma:          forma,
+    conta:          conta,
+    numConta:       '',
+    data:           dataIso,
+    valor:          valor,
+    tipo:           tipo,
+    oculto:         false
   };
 
   ALL_ROWS.push(novoItem);
@@ -2982,9 +3208,18 @@ function renderCartFatChart(cartoesData) {
         legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } },
         tooltip: {
           callbacks: {
-            label: ctx => ' ' + money(ctx.parsed.y)
+            label: ctx => ' ' + money(ctx.parsed.y) + '  (clique para filtrar)'
           }
         }
+      },
+      onClick: (evt, elements) => {
+        if (!elements || !elements.length) return;
+        const dsIdx = elements[0].datasetIndex;
+        const nomeCartao = datasets[dsIdx] ? datasets[dsIdx].label : null;
+        if (nomeCartao) irParaLancamentosCartao(nomeCartao);
+      },
+      onHover: (evt, elements) => {
+        evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
       },
       scales: {
         x: { stacked: false, ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.04)' } },
@@ -3199,7 +3434,7 @@ function drpShortcut(key) {
 // ═══════════════════════════════════════════════════════════════
 // NAVEGAÇÃO CONTEXTUAL → aba lançamentos com filtro
 // ═══════════════════════════════════════════════════════════════
-function irParaLancamentosCategoria(cat) {
+function irParaLancamentosConta(contaVal) {
   document.querySelectorAll('.nav-links a').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-links a').forEach(el => {
@@ -3207,16 +3442,76 @@ function irParaLancamentosCategoria(cat) {
   });
   document.getElementById('tab-registro').classList.add('active');
 
-  const fCat = document.getElementById('filtroCategoria');
-  const hasOpt = fCat && [...fCat.options].some(o => o.value === cat);
-  if (fCat && hasOpt) fCat.value = cat;
-  else if (fCat) fCat.value = 'todas';
+  const fConta = document.getElementById('filtroConta');
+  const hasOpt = fConta && [...fConta.options].some(o => o.value === contaVal);
+  if (fConta && hasOpt) fConta.value = contaVal;
+  else if (fConta) fConta.value = 'todas';
 
-  // clear date range
   drpStart = null; drpEnd = null; drpUpdateBtn();
   document.querySelectorAll('.drp-sc-btn').forEach(b => b.classList.remove('active'));
   const t = document.getElementById('drpSc-todos');
   if (t) t.classList.add('active');
+
+  paginaAtual = 1;
+  filtrarTabela();
+}
+
+function irParaLancamentosCartao(nomeCart) {
+  // Encontra o valor da conta correspondente ao nome do cartão
+  const contaMatch = ALL_ROWS.find(r => nomeCartao(r) === nomeCart);
+  const contaVal = contaMatch ? contaMatch.conta : nomeCart;
+
+  document.querySelectorAll('.nav-links a').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(el => {
+    if (el.textContent.trim() === 'Lançamentos') el.classList.add('active');
+  });
+  document.getElementById('tab-registro').classList.add('active');
+
+  const fConta = document.getElementById('filtroConta');
+  const hasOpt = fConta && [...fConta.options].some(o => o.value === contaVal);
+  if (fConta && hasOpt) fConta.value = contaVal;
+  else if (fConta) fConta.value = 'todas';
+
+  drpStart = null; drpEnd = null; drpUpdateBtn();
+  document.querySelectorAll('.drp-sc-btn').forEach(b => b.classList.remove('active'));
+  const t = document.getElementById('drpSc-todos');
+  if (t) t.classList.add('active');
+
+  paginaAtual = 1;
+  filtrarTabela();
+}
+
+function irParaLancamentosCategoria(cat, isMacro) {
+  document.querySelectorAll('.nav-links a').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(el => {
+    if (el.textContent.trim() === 'Lançamentos') el.classList.add('active');
+  });
+  document.getElementById('tab-registro').classList.add('active');
+
+  // Limpa filtros anteriores
+  drpStart = null; drpEnd = null; drpUpdateBtn();
+  document.querySelectorAll('.drp-sc-btn').forEach(b => b.classList.remove('active'));
+  const t = document.getElementById('drpSc-todos');
+  if (t) t.classList.add('active');
+  document.getElementById('filtroConta').value = 'todas';
+  document.getElementById('filtroTipo').value = 'todas';
+
+  const fCat = document.getElementById('filtroCategoria');
+  const searchTx = document.getElementById('searchTx');
+
+  if (isMacro) {
+    // Filtra pelo dropdown de categoria macro
+    const hasOpt = fCat && [...fCat.options].some(o => o.value === cat);
+    if (fCat && hasOpt) fCat.value = cat;
+    else if (fCat) fCat.value = 'todas';
+    if (searchTx) searchTx.value = '';
+  } else {
+    // Filtra pela busca textual usando o nome da subcategoria
+    if (fCat) fCat.value = 'todas';
+    if (searchTx) searchTx.value = cat;
+  }
 
   paginaAtual = 1;
   filtrarTabela();
@@ -3340,17 +3635,32 @@ function renderAbaCategorias() {
   const totalDesp = rows.reduce((s, r) => s + r.valor, 0);
   document.getElementById('catHeroTotal').textContent = money(totalDesp);
 
-  // Agrupa usando categoriaMacro manual (se definido), depois CAT_MAP, depois keywords
+  // Agrupa: CAT_MAP tem prioridade, depois categoriaMacro (se não for valor bloqueado), depois keywords
   const grupos = {};
   rows.forEach(r => {
     const sub = r.categoria || 'Outros';
-    const grp = r.categoriaMacro || getCatGroup(sub);
+    let grp;
+    if (CAT_MAP[sub] && !CAT_MAP[sub].startsWith('__custom__')) {
+      grp = CAT_MAP[sub];
+    } else if (r.categoriaMacro && !CAT_MACRO_BLOCKLIST.has(r.categoriaMacro.toLowerCase().trim())) {
+      grp = r.categoriaMacro;
+    } else {
+      grp = getCatGroup(sub);
+    }
     if (!grupos[grp]) grupos[grp] = { total: 0, subs: {} };
     grupos[grp].total = round2(grupos[grp].total + r.valor);
     grupos[grp].subs[sub] = round2((grupos[grp].subs[sub] || 0) + r.valor);
   });
 
-  const arrGrupos = Object.entries(grupos).sort((a,b) => b[1].total - a[1].total);
+  // Filtro de pesquisa
+  const catSearchTerm = '';
+  let arrGrupos = Object.entries(grupos).sort((a,b) => b[1].total - a[1].total);
+  if (catSearchTerm) {
+    arrGrupos = arrGrupos.filter(([grpNome, grpData]) => {
+      if (grpNome.toLowerCase().includes(catSearchTerm)) return true;
+      return Object.keys(grpData.subs).some(sub => sub.toLowerCase().includes(catSearchTerm));
+    });
+  }
 
   // donut chart
   const catCtx = document.getElementById('catDoughnut');
@@ -3399,7 +3709,7 @@ function renderAbaCategorias() {
           const subBarPct = grpData.total > 0 ? ((val / grpData.total)*100).toFixed(1) : 0;
           const safeSubClick = escapeHTML(sub).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
           const safeGrpClick = escapeHTML(grpNome).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-          return `<div class="cat-sub-item" onclick="irParaLancamentosCategoria('${safeSubClick}')">
+          return `<div class="cat-sub-item" onclick="irParaLancamentosCategoria('${safeSubClick}', false)">
             <span class="cat-sub-icon">🏷️</span>
             <span class="cat-sub-name">${escapeHTML(sub)}</span>
             <div class="cat-sub-bar-wrap"><div class="cat-sub-bar-fill" style="width:${subBarPct}%;background:${cor}"></div></div>
@@ -3416,16 +3726,208 @@ function renderAbaCategorias() {
 
 function catInlineEditStart(btn, sub, currentGrp) {
   const item = btn.closest('.cat-sub-item');
-  if (item.nextElementSibling && item.nextElementSibling.classList.contains('cat-inline-edit')) return;
-  const allGroups = [...new Set(ALL_ROWS.map(r => getCatGroup(r.categoria)))].sort();
-  const opts = allGroups.map(g => `<option value="${escapeHTML(g)}"${g===currentGrp?' selected':''}>${escapeHTML(g)}</option>`).join('');
+  // remove qualquer editor inline já aberto
+  const existing = item.nextElementSibling;
+  if (existing && existing.classList.contains('cat-inline-edit')) {
+    existing.remove();
+    return;
+  }
+
+  const editId = 'catIE_' + Date.now();
   const editEl = document.createElement('div');
   editEl.className = 'cat-inline-edit';
-  const safeSubSave = sub.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  editEl.innerHTML = `<select class="cat-inline-input" id="catInlineSel${Date.now()}">${opts}</select>
-    <button class="cat-inline-save" onclick="catInlineEditSave(this,'${safeSubSave}')">Salvar</button>
-    <button class="cat-inline-cancel" onclick="this.closest('.cat-inline-edit').remove()">✕</button>`;
+  editEl.style.cssText = 'padding:8px 12px 10px;display:flex;flex-direction:column;gap:6px;background:rgba(0,0,0,0.2);border-top:1px solid var(--border)';
+
+  // estrutura do dropdown de busca
+  editEl.innerHTML = `
+    <div id="${editId}_wrap" style="position:relative;width:100%">
+      <button id="${editId}_trigger" onclick="catIETrigger('${editId}')"
+        style="width:100%;background:#050b14;border:1px solid rgba(255,255,255,0.08);color:var(--text);
+               padding:9px 12px;border-radius:8px;font-family:inherit;font-size:12px;cursor:pointer;
+               display:flex;justify-content:space-between;align-items:center;text-align:left">
+        <span id="${editId}_label">${escapeHTML(currentGrp)}</span>
+        <span style="color:var(--muted);font-size:10px">▼</span>
+      </button>
+      <div id="${editId}_panel" style="display:none;position:fixed;min-width:420px;max-width:600px;
+           background:#0d1f3c;border:1px solid rgba(255,255,255,0.1);border-radius:10px;
+           box-shadow:0 16px 48px rgba(0,0,0,.6);z-index:9000;overflow:hidden">
+        <div style="padding:8px">
+          <input id="${editId}_search" placeholder="Buscar ou digitar nova categoria..."
+            style="width:100%;background:#050b14;border:1px solid rgba(255,255,255,0.08);color:var(--text);
+                   padding:8px 10px;border-radius:7px;font-family:inherit;font-size:12px;outline:none"
+            oninput="catIEFilter('${editId}')"
+            onkeydown="catIEKeydown(event,'${editId}')">
+        </div>
+        <div id="${editId}_list" style="max-height:180px;overflow-y:auto;padding:4px 6px 8px"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="cat-inline-save" onclick="catIESave('${editId}','${escapeHTML(sub).replace(/'/g,"\\'")}')">Salvar</button>
+      <button class="cat-inline-cancel" onclick="this.closest('.cat-inline-edit').remove()">✕</button>
+    </div>`;
+
   item.insertAdjacentElement('afterend', editEl);
+  catIEPopulateList(editId, currentGrp, '');
+  // fecha ao clicar fora
+  setTimeout(() => {
+    document.addEventListener('click', function handler(e) {
+      const wrap = document.getElementById(editId + '_wrap');
+      if (wrap && !wrap.contains(e.target)) {
+        const panel = document.getElementById(editId + '_panel');
+        if (panel) panel.style.display = 'none';
+      }
+      if (!editEl.isConnected) document.removeEventListener('click', handler);
+    });
+  }, 0);
+}
+
+function catIETrigger(editId) {
+  const panel = document.getElementById(editId + '_panel');
+  const trigger = document.getElementById(editId + '_trigger');
+  if (!panel || !trigger) return;
+  const isOpen = panel.style.display !== 'none';
+  if (isOpen) {
+    panel.style.display = 'none';
+    return;
+  }
+  // Posiciona o painel usando coordenadas fixas do trigger
+  const rect = trigger.getBoundingClientRect();
+  panel.style.top  = (rect.bottom + 4) + 'px';
+  panel.style.left = rect.left + 'px';
+  // Garante que não saia da tela pela direita
+  panel.style.display = 'block';
+  const panelRect = panel.getBoundingClientRect();
+  if (panelRect.right > window.innerWidth - 8) {
+    panel.style.left = Math.max(8, window.innerWidth - panelRect.width - 8) + 'px';
+  }
+  const search = document.getElementById(editId + '_search');
+  if (search) { search.value = ''; search.focus(); }
+  catIEFilter(editId);
+}
+
+function catIEPopulateList(editId, selected, termo) {
+  const list = document.getElementById(editId + '_list');
+  if (!list) return;
+  const cats = getCategoriasmacro();
+  const t = termo.trim().toLowerCase();
+  const filtradas = t ? cats.filter(c => c.toLowerCase().includes(t)) : cats;
+  let html = '';
+  if (filtradas.length > 0) {
+    html += `<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:4px 6px 2px">Categorias disponíveis</div>`;
+    filtradas.forEach(c => {
+      const icon = CAT_ICONS[c] || '📦';
+      const active = c === selected ? 'background:rgba(0,200,150,0.15);color:var(--accent);' : '';
+      html += `<div onclick="catIESelect('${editId}','${escapeHTML(c).replace(/'/g,"\\'")}'); event.stopPropagation()"
+        style="padding:7px 10px;border-radius:6px;cursor:pointer;font-size:12px;${active}"
+        onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='${active ? 'rgba(0,200,150,0.15)' : 'transparent'}'">${icon} ${escapeHTML(c)}</div>`;
+    });
+  }
+  const termoBruto = termo.trim();
+  const exato = cats.some(c => c.toLowerCase() === termoBruto.toLowerCase());
+  if (termoBruto && !exato) {
+    html += `<div onclick="catIESelect('${editId}','${escapeHTML(termoBruto).replace(/'/g,"\\'")}'); event.stopPropagation()"
+      style="padding:7px 10px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--accent2)"
+      onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">+ Criar "${escapeHTML(termoBruto)}"</div>`;
+  }
+  if (!html) html = `<div style="padding:8px 10px;font-size:11px;color:var(--muted)">Nenhuma categoria encontrada.</div>`;
+  list.innerHTML = html;
+}
+
+function catIEFilter(editId) {
+  const search = document.getElementById(editId + '_search');
+  const label = document.getElementById(editId + '_label');
+  if (!search || !label) return;
+  catIEPopulateList(editId, label.textContent, search.value);
+}
+
+function catIEKeydown(e, editId) {
+  if (e.key === 'Enter') {
+    const t = e.target.value.trim();
+    if (t) catIESelect(editId, t);
+  }
+  if (e.key === 'Escape') {
+    const panel = document.getElementById(editId + '_panel');
+    if (panel) panel.style.display = 'none';
+  }
+}
+
+function catIESelect(editId, cat) {
+  const label = document.getElementById(editId + '_label');
+  if (label) label.textContent = cat;
+  const panel = document.getElementById(editId + '_panel');
+  if (panel) panel.style.display = 'none';
+}
+
+function catIESave(editId, sub) {
+  const label = document.getElementById(editId + '_label');
+  if (!label) return;
+  const newGrp = label.textContent.trim();
+  if (!newGrp) return;
+
+  // Atualiza r.categoriaMacro diretamente em todos os lançamentos com r.categoria === sub
+  let alterados = 0;
+  ALL_ROWS.forEach(r => {
+    if (r.categoria === sub) {
+      r.categoriaMacro = newGrp;
+      alterados++;
+    }
+  });
+
+  // Mantém CAT_MAP como índice de mapeamento persistido
+  CAT_MAP[sub] = newGrp;
+
+  // Se for categoria nova, registra como custom
+  const existentes = getCategoriasmacro();
+  if (!existentes.includes(newGrp)) {
+    CUSTOM_CATEGORIES.push(newGrp);
+    CAT_MAP['__custom__' + newGrp] = newGrp;
+  }
+
+  // Persiste rows e mapa de categorias
+  Promise.all([setStoredRows(ALL_ROWS), setStoredCatMap(CAT_MAP)])
+    .then(() => {
+      recalcularEstruturas();
+      renderAbaCategorias();
+      if (csvLoaded) render();
+    })
+    .catch(err => console.error('Erro ao salvar mover categoria:', err));
+}
+
+// ── NOVA CATEGORIA MODAL (#6) ──
+let CUSTOM_CATEGORIES = [];  // categorias criadas pelo usuário
+
+function abrirNovaCategoriaModal() {
+  document.getElementById('novaCatInput').value = '';
+  document.getElementById('novaCatErro').style.display = 'none';
+  document.getElementById('novaCatModal').classList.add('active');
+  setTimeout(() => document.getElementById('novaCatInput').focus(), 100);
+}
+
+function fecharNovaCategoriaModal() {
+  document.getElementById('novaCatModal').classList.remove('active');
+}
+
+function salvarNovaCategoria() {
+  const nome = document.getElementById('novaCatInput').value.trim();
+  const erroEl = document.getElementById('novaCatErro');
+  if (!nome) {
+    erroEl.textContent = 'O nome não pode ser vazio.';
+    erroEl.style.display = 'block';
+    return;
+  }
+  const todasCats = [...Object.keys(CAT_DEFAULT_GROUPS), ...CUSTOM_CATEGORIES, ...Object.keys(CAT_MAP)];
+  if (todasCats.some(c => c.toLowerCase() === nome.toLowerCase())) {
+    erroEl.textContent = 'Essa categoria já existe.';
+    erroEl.style.display = 'block';
+    return;
+  }
+  CUSTOM_CATEGORIES.push(nome);
+  // Persiste no IndexedDB via CAT_MAP (usa string vazia como marcador de criação manual)
+  CAT_MAP['__custom__' + nome] = nome;
+  setStoredCatMap(CAT_MAP).then(() => {
+    fecharNovaCategoriaModal();
+    renderAbaCategorias();
+  });
 }
 
 function catInlineEditSave(btn, sub) {
