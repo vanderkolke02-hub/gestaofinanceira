@@ -672,10 +672,10 @@
     .cat-sub-bar-fill{height:100%;border-radius:2px}
     .cat-sub-amount{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text);min-width:80px;text-align:right}
     .cat-sub-pct{font-size:10px;color:var(--muted);min-width:34px;text-align:right}
-    .cat-sub-edit{
+    .cat-sub-edit {
       background:none;border:1px solid transparent;color:var(--muted);
       font-size:11px;padding:2px 6px;border-radius:4px;cursor:pointer;
-      transition:all .12s;opacity:0;
+      transition:all .12s;opacity:1;
     }
     .cat-sub-item:hover .cat-sub-edit{opacity:1}
     .cat-sub-edit:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(14,165,233,.08)}
@@ -725,32 +725,45 @@
       .hm-header-stats { flex-wrap: wrap; gap: 10px; }
       .hm-month-nav { width: 100%; justify-content: space-between; }
       .hm-total { font-size: 18px; }
-      .filter-row { gap: 6px; }
-      .filter-select { font-size: 11px; padding: 5px 8px; }
+      .filter-row { gap: 6px; flex-wrap: wrap; }
+      .filter-select { font-size: 11px; padding: 5px 8px; flex: 1 1 auto; min-width: 0; }
       .table-actions { flex-direction: column; align-items: stretch; gap: 8px; }
       .search-input { width: 100%; }
       .add-tx-btn { width: 100%; text-align: center; }
       .sub-kpis { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .mini-val { font-size: 14px; }
-      .tx-table-panel { padding: 8px; }
+      .tx-table-panel { padding: 8px; overflow-x: hidden; }
+      .tx-table { width: 100%; table-layout: fixed; }
       .tx-table th, .tx-table td { padding: 8px 6px; font-size: 11px; }
       .tx-table th:nth-child(3), .tx-table td:nth-child(3),
       .tx-table th:nth-child(4), .tx-table td:nth-child(4) { display: none; }
       .modal-card { margin: 8px; padding: 14px; border-radius: 12px; }
       .modal-grid-2 { grid-template-columns: 1fr; }
       .modal-title { font-size: 16px; }
-      .cat-aba-hero { flex-direction: column; align-items: flex-start; gap: 10px; }
+      /* Categorias mobile */
+      .cat-aba-hero { flex-direction: column; align-items: flex-start; gap: 10px; width: 100%; box-sizing: border-box; }
       .cat-aba-hero-val { font-size: 24px; }
+      .cat-aba-period-nav { width: 100%; justify-content: space-between; }
+      .cat-period-lbl { text-align: center; flex: 1; }
+      .cat-aba-donut-row { grid-template-columns: 1fr; gap: 10px; width: 100%; }
+      .cat-aba-donut-panel { width: 100%; box-sizing: border-box; }
+      .cat-aba-list { width: 100%; box-sizing: border-box; }
       .cat-group-header { padding: 10px 12px; gap: 8px; }
       .cat-group-amount { font-size: 12px; }
+      .cat-group-card { width: 100%; box-sizing: border-box; overflow: hidden; }
+      .cat-sub-item { flex-wrap: wrap; gap: 6px; }
+      .cat-sub-name { min-width: 0; flex: 1 1 60%; }
+      .cat-sub-bar-wrap { width: 60px; }
+      /* Lançamentos mobile */
+      .sub-kpis { width: 100%; box-sizing: border-box; }
+      .pagination-container { flex-direction: column; gap: 8px; align-items: center; }
+      .drp-panel { width: 100vw; left: 0; right: 0; }
+      .drp-calendars { flex-direction: column; padding: 10px; }
+      .drp-cal + .drp-cal { margin-left: 0; padding-left: 0; border-left: none; border-top: 1px solid rgba(255,255,255,.06); padding-top: 12px; margin-top: 12px; }
       .cartoes-hero-total { font-size: 32px; }
       .cartao-card { padding: 14px; }
       .tx-drawer { width: 100%; border-left: none; border-top: 1px solid rgba(255,255,255,0.08); border-radius: 16px 16px 0 0; top: auto; bottom: 0; height: 90vh; transform: translateY(100%); }
       .tx-drawer.open { transform: translateY(0); }
-      .pagination-container { flex-direction: column; gap: 8px; align-items: center; }
-      .drp-panel { width: 100vw; left: -16px; }
-      .drp-calendars { flex-direction: column; padding: 10px; }
-      .drp-cal + .drp-cal { margin-left: 0; padding-left: 0; border-left: none; border-top: 1px solid rgba(255,255,255,.06); padding-top: 12px; margin-top: 12px; }
     }
     @media (max-width: 480px) {
       .kpi-strip { grid-template-columns: 1fr; }
@@ -862,9 +875,95 @@
     .gdrive-env-steps li::before {
       content: '→'; color: #f59e0b; flex-shrink: 0; font-weight: 700;
     }
-  </style>
+  /* ── TELA DE LOGIN ── */
+  #loginScreen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #071120;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  #loginScreen.hidden { display: none; }
+  .login-bg {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  }
+  .login-blob {
+    position: absolute; border-radius: 50%; filter: blur(80px); opacity: .35;
+  }
+  .login-blob.b1 { width: 500px; height: 500px; background: #00c896; top: -120px; left: -100px; animation: blobMove1 8s ease-in-out infinite alternate; }
+  .login-blob.b2 { width: 400px; height: 400px; background: #0ea5e9; bottom: -100px; right: -80px; animation: blobMove2 10s ease-in-out infinite alternate; }
+  .login-blob.b3 { width: 300px; height: 300px; background: #7c3aed; top: 40%; left: 50%; transform: translate(-50%,-50%); animation: blobMove3 12s ease-in-out infinite alternate; }
+  @keyframes blobMove1 { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,30px) scale(1.1); } }
+  @keyframes blobMove2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-30px,-40px) scale(1.08); } }
+  @keyframes blobMove3 { from { transform: translate(-50%,-50%) scale(1); } to { transform: translate(-40%,-60%) scale(1.12); } }
+  .login-card {
+    position: relative; z-index: 1;
+    background: rgba(13,31,60,0.85);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 48px 40px 40px;
+    width: 100%; max-width: 380px;
+    text-align: center;
+    box-shadow: 0 32px 80px rgba(0,0,0,.6);
+    backdrop-filter: blur(20px);
+  }
+  .login-logo {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg,#00c896,#0ea5e9);
+    color: #071120; font-weight: 800; font-size: 14px;
+    padding: 8px 18px; border-radius: 8px; margin-bottom: 28px;
+  }
+  .login-logo .ver { font-size: 20px; font-weight: 900; }
+  .login-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .login-sub { font-size: 13px; color: var(--text2); margin-bottom: 36px; line-height: 1.6; }
+  .login-google-btn {
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px;
+    background: #fff; color: #1a1a2e;
+    font-family: inherit; font-size: 14px; font-weight: 700;
+    padding: 14px 20px; border-radius: 12px; border: none; cursor: pointer;
+    transition: opacity .15s, transform .1s; margin-bottom: 14px;
+  }
+  .login-google-btn:hover { opacity: .92; transform: translateY(-1px); }
+  .login-google-btn:active { transform: translateY(0); }
+  .login-google-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+  .login-google-icon { width: 20px; height: 20px; }
+  .login-skip {
+    background: none; border: 1px solid rgba(255,255,255,.1); color: var(--text2);
+    font-family: inherit; font-size: 13px; padding: 12px 20px;
+    border-radius: 10px; cursor: pointer; width: 100%;
+    transition: all .15s;
+  }
+  .login-skip:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
+  .login-status { font-size: 12px; color: var(--muted); min-height: 18px; margin-top: 16px; }
+  .login-status.loading { color: var(--accent2); }
+  .login-status.err { color: var(--danger); }
+</style>
 </head>
 <body>
+
+<!-- ── TELA DE LOGIN ── -->
+<div id="loginScreen">
+  <div class="login-bg">
+    <div class="login-blob b1"></div>
+    <div class="login-blob b2"></div>
+    <div class="login-blob b3"></div>
+  </div>
+  <div class="login-card">
+    <div class="login-logo"><span class="ver">4.0</span> Gestão Financeira</div>
+    <div class="login-title">Bem-vindo de volta</div>
+    <div class="login-sub">Conecte sua conta Google para carregar automaticamente seus dados salvos no Drive.</div>
+    <button class="login-google-btn" id="loginGoogleBtn" onclick="loginComGoogle()">
+      <svg class="login-google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Entrar com Google
+    </button>
+    <button class="login-skip" onclick="loginSemGoogle()">Continuar sem login</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
 
 <nav class="topnav">
   <div class="brand-badge"><span class="ver">4.0</span> Gestão Financeira Empresarial</div>
@@ -1082,6 +1181,25 @@
           </div>
         </div>
       </div>
+
+      <!-- ── MANUTENÇÃO DE DADOS ── -->
+      <div class="gdrive-section" style="margin-top:16px">
+        <div class="gdrive-section-title">🔧 Manutenção de Dados</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
+          Normaliza todos os registros já salvos: converte textos para <strong style="color:var(--text)">MAIÚSCULAS</strong>
+          e remove espaços duplos em descrição, categoria, conta e forma de pagamento.
+          Execute uma única vez após atualizar o arquivo.
+        </p>
+        <div class="gdrive-btn-row">
+          <button class="gdrive-btn" id="btnNormalizar"
+            style="background:rgba(0,200,150,0.15);border:1px solid rgba(0,200,150,0.35);color:var(--accent)"
+            onclick="normalizarDadosHistoricos()">
+            ✦ Normalizar dados históricos
+          </button>
+        </div>
+        <div class="gdrive-status" id="normalizarStatus"></div>
+      </div>
+
     </div>
   </div>
 
@@ -1340,15 +1458,15 @@
     </div>
 
     <div class="modal-grid-2">
-      <div class="modal-group" style="position:relative">
-        <span class="modal-label-floating">Categoria</span>
+      <div class="modal-group" style="position:relative;overflow:visible">
+        <span class="modal-label-floating" style="z-index:2">Categoria</span>
         <!-- dropdown de busca igual ao drawer -->
         <div id="mMacroWrap" style="position:relative">
           <button id="mMacroTrigger" type="button" onclick="mMacroToggle()"
             style="width:100%;background:#050b14;border:1px solid rgba(255,255,255,0.08);color:var(--text);
                    padding:12px;border-radius:10px;font-family:inherit;font-size:13px;cursor:pointer;
-                   display:flex;justify-content:space-between;align-items:center;text-align:left">
-            <span id="mMacroLabel" style="color:var(--muted)">Alimentação, Moradia, Lazer...</span>
+                   display:flex;justify-content:space-between;align-items:center;text-align:left;overflow:hidden;min-width:0">
+            <span id="mMacroLabel" style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0">Alimentação, Moradia, Lazer...</span>
             <span style="color:var(--muted);font-size:10px">▼</span>
           </button>
           <div id="mMacroPanel" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;
@@ -1432,6 +1550,12 @@ function escapeHTML(str) {
     .replace(/'/g, '&#x27;');
 }
 
+// Normaliza texto: converte para MAIÚSCULAS e colapsa espaços duplos
+function normalizar(str) {
+  if (!str) return str;
+  return String(str).toUpperCase().replace(/\s{2,}/g, ' ').trim();
+}
+
 // ═══════════════════════════════════════════════════════════════
 // ESTADO GLOBAL
 // ═══════════════════════════════════════════════════════════════
@@ -1449,6 +1573,9 @@ let csvLoaded = false;
 let paginaAtual = 1;
 let itensPorPagina = 10;
 let FILTRO_MESES_SELECIONADOS = [];
+
+// Valores que não devem aparecer como categoria macro
+const CAT_MACRO_BLOCKLIST = new Set(['generica','genérica','sem categoria','outros','other','']);
 
 // ── CARTÕES ──
 let CART_CFG = {};       // { "nomeCartao": { limite, fecha, vence } }
@@ -1474,10 +1601,34 @@ function parseBRL(str) {
 function parseDate(str) {
   if (!str) return null;
   str = String(str).trim();
+  // DD/MM/AAAA ou D/M/AAAA
   let m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (m) return new Date(+m[3], +m[2] - 1, +m[1]);
+  // AAAA-MM-DD
   m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+  // DD/abrev ou DD/abrev/AAAA (ex: 10/dez, 5/jan/2025)
+  const MESES_ABREV = {jan:0,fev:1,mar:2,abr:3,mai:4,jun:5,jul:6,ago:7,set:8,out:9,nov:10,dez:11,
+                       jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  m = str.match(/^(\d{1,2})[\/\-]([a-zA-Zç]{3,})(?:[\/\-](\d{2,4}))?/);
+  if (m) {
+    const dia = +m[1];
+    const mesAbrev = m[2].toLowerCase().slice(0, 3).normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const mesIdx = MESES_ABREV[mesAbrev];
+    if (mesIdx !== undefined) {
+      let ano = m[3] ? +m[3] : null;
+      if (ano && ano < 100) ano += 2000;
+      if (!ano) {
+        // Infere o ano: se o mês já passou neste ano, usa este ano; se não, usa ano anterior
+        const hoje = new Date();
+        ano = hoje.getFullYear();
+        if (mesIdx > hoje.getMonth() || (mesIdx === hoje.getMonth() && dia > hoje.getDate())) {
+          ano -= 1;
+        }
+      }
+      return new Date(ano, mesIdx, dia);
+    }
+  }
   return null;
 }
 
@@ -1801,15 +1952,19 @@ function renderContasETop() {
     totalConsolidado += cSaldo;
     const pct = (Math.abs(cSaldo) / maxC) * 100;
     const cor = cSaldo < 0 ? 'var(--danger)' : 'var(--accent2)';
-    const safeNome = escapeHTML(cNome).replace(/'/g, "\\'");
-    divContas.innerHTML += `
-      <div class="account-row" onclick="irParaLancamentosConta('${safeNome}')" style="cursor:pointer" title="Ver lançamentos de ${escapeHTML(cNome)}">
-        <div class="account-meta">
-          <span class="account-name">${escapeHTML(cNome)}</span>
-          <span class="account-val" style="color:${cor}">${money(cSaldo)}</span>
-        </div>
-        <div class="account-bar"><div class="account-fill" style="width:${pct}%;background:${cor}"></div></div>
-      </div>`;
+    const div = document.createElement('div');
+    div.className = 'account-row';
+    div.style.cursor = 'pointer';
+    div.title = 'Ver lançamentos de ' + cNome;
+    div.dataset.conta = cNome;
+    div.innerHTML = `
+      <div class="account-meta">
+        <span class="account-name">${escapeHTML(cNome)}</span>
+        <span class="account-val" style="color:${cor}">${money(cSaldo)}</span>
+      </div>
+      <div class="account-bar"><div class="account-fill" style="width:${pct}%;background:${cor}"></div></div>`;
+    div.addEventListener('click', () => irParaLancamentosConta(cNome));
+    divContas.appendChild(div);
   });
 
   const accTotal = document.getElementById('accountTotal');
@@ -2068,19 +2223,22 @@ document.getElementById('csvFileInput')?.addEventListener('change', function(e) 
         const dtParsed = parseDate(dStr);
         const dtIso    = dtParsed ? dtParsed.toISOString().slice(0, 10) : new Date().toISOString().slice(0,10);
 
-        const descricao       = (mapDesc     ? row[mapDesc]     : '') || 'Sem descrição';
-        const catMacroCSV     = mapCatMacro  ? (row[mapCatMacro] || '').trim() : '';
-        const catAutoSugerida = catByDesc[descricao.toLowerCase()] || '';
-        const categoriaMacroFinal = catMacroCSV || catAutoSugerida || 'Genérica';
-        const categoriaFinal      = descricao;  // subcategoria = descrição importada
+        const descricao           = normalizar((mapDesc     ? row[mapDesc]     : '') || 'SEM DESCRIÇÃO');
+        const catMacroCSV         = normalizar(mapCatMacro  ? (row[mapCatMacro] || '').trim() : '');
+        const catAutoSugerida     = catByDesc[descricao.toLowerCase()] || '';
+        // Só aceita catMacroCSV se não for um valor bloqueado (ex: "Generica")
+        const catMacroLimpa       = (catMacroCSV && !CAT_MACRO_BLOCKLIST.has(catMacroCSV.toLowerCase())) ? catMacroCSV : '';
+        const categoriaMacroFinal = catMacroLimpa || catAutoSugerida || '';
+        // categoria (subcategoria) fica vazio — será preenchida pelo getCatGroup ou pelo usuário via Mover
+        const categoriaFinal      = '';
 
         novasLinhas.push({
           id:             'csv-' + Math.random().toString(36).substr(2, 9),
           descricao:      descricao,
-          categoria:      categoriaFinal,
-          categoriaMacro: categoriaMacroFinal,
-          forma:          (mapForma    ? row[mapForma]    : '') || 'Não informada',
-          conta:          (mapConta    ? row[mapConta]    : '') || 'Principal',
+          categoria:      normalizar(categoriaFinal || descricao),
+          categoriaMacro: normalizar(categoriaMacroFinal),
+          forma:          normalizar((mapForma    ? row[mapForma]    : '') || 'NÃO INFORMADA'),
+          conta:          normalizar((mapConta    ? row[mapConta]    : '') || 'PRINCIPAL'),
           numConta:       (mapNumConta ? row[mapNumConta] : '') || '',
           data:           dtIso,
           valor:          vNum,
@@ -2357,6 +2515,7 @@ function alternarOcultarLinha(id) {
     setStoredRows(ALL_ROWS).then(() => {
       filtrarTabela();
       if(csvLoaded) render();
+      agendarAutoSave();
     }).catch(err => console.error('Erro ao atualizar ocultação:', err));
   }
 }
@@ -2583,7 +2742,7 @@ function filtrarListaCat() {
 function catSearchKeydown(e) {
   if (e.key === 'Enter') {
     const termo = e.target.value.trim();
-    if (termo) selecionarCategoria(termo);
+    if (termo) selecionarCategoria(normalizar(termo));
   }
   if (e.key === 'Escape') fecharCatDropdown();
 }
@@ -2614,14 +2773,11 @@ function fecharCatDropdown() {
 
 function selecionarCategoria(cat) {
   const lbl = document.getElementById('catTriggerLabel');
-  if (lbl) lbl.textContent = cat;
+  if (lbl) lbl.textContent = normalizar(cat);
   fecharCatDropdown();
 }
 
 // ── DROPDOWN CATEGORIA MACRO ──
-// Valores que não devem aparecer como opção de categoria macro
-const CAT_MACRO_BLOCKLIST = new Set(['generica','genérica','sem categoria','outros','other','']);
-
 function getCategoriasmacro() {
   const fromDefault = new Set(Object.keys(CAT_DEFAULT_GROUPS));
   const fromCustom  = new Set(CUSTOM_CATEGORIES);
@@ -2670,7 +2826,7 @@ function filtrarListaMacro() {
 function macroSearchKeydown(e) {
   if (e.key === 'Enter') {
     const termo = e.target.value.trim();
-    if (termo) selecionarMacro(termo);
+    if (termo) selecionarMacro(normalizar(termo));
   }
   if (e.key === 'Escape') fecharMacroDropdown();
 }
@@ -2701,7 +2857,7 @@ function fecharMacroDropdown() {
 
 function selecionarMacro(cat) {
   const lbl = document.getElementById('macroTriggerLabel');
-  if (lbl) lbl.textContent = cat;
+  if (lbl) lbl.textContent = normalizar(cat);
   fecharMacroDropdown();
 }
 
@@ -2723,13 +2879,13 @@ function salvarEdicaoDrawer() {
   const novoValor = parseBRL(document.getElementById('edValor').value);
   if (novoValor === 0) { alert('Valor inválido.'); return; }
 
-  item.descricao      = document.getElementById('edDesc').value.trim() || item.descricao;
+  item.descricao      = normalizar(document.getElementById('edDesc').value.trim() || item.descricao);
   item.valor          = novoValor;
   item.data           = novaData.toISOString().slice(0, 10);
-  item.conta          = document.getElementById('edConta').value.trim() || item.conta;
-  item.forma          = document.getElementById('edForma').value.trim() || item.forma;
-  item.categoria      = document.getElementById('catTriggerLabel').textContent.trim() || item.categoria;
-  item.categoriaMacro = document.getElementById('macroTriggerLabel').textContent.trim() || item.categoriaMacro;
+  item.conta          = normalizar(document.getElementById('edConta').value.trim() || item.conta);
+  item.forma          = normalizar(document.getElementById('edForma').value.trim() || item.forma);
+  item.categoria      = normalizar(document.getElementById('catTriggerLabel').textContent.trim() || item.categoria);
+  item.categoriaMacro = normalizar(document.getElementById('macroTriggerLabel').textContent.trim() || item.categoriaMacro);
   item.tipo           = document.getElementById('edTipo').value;
   item.assinatura     = document.getElementById('edAssinatura').checked;
 
@@ -2738,6 +2894,7 @@ function salvarEdicaoDrawer() {
     filtrarTabela();
     if (csvLoaded) render();
     cancelarEdicaoDrawer();
+    agendarAutoSave();
   }).catch(err => console.error('Erro ao salvar edição:', err));
 }
 
@@ -2818,7 +2975,7 @@ function mMacroFilter() {
 function mMacroKeydown(e) {
   if (e.key === 'Enter') {
     const t = e.target.value.trim();
-    if (t) mMacroSelect(t);
+    if (t) mMacroSelect(normalizar(t));
   }
   if (e.key === 'Escape') {
     const panel = document.getElementById('mMacroPanel');
@@ -2829,7 +2986,7 @@ function mMacroKeydown(e) {
 
 function mMacroSelect(cat) {
   const lbl = document.getElementById('mMacroLabel');
-  if (lbl) { lbl.textContent = cat; lbl.style.color = 'var(--text)'; }
+  if (lbl) { lbl.textContent = normalizar(cat); lbl.style.color = 'var(--text)'; }
   const panel = document.getElementById('mMacroPanel');
   if (panel) panel.style.display = 'none';
   mMacroOpen = false;
@@ -2861,18 +3018,18 @@ function atualizarModalBadge() {
 }
 
 function salvarTransacaoManual() {
-  const conta = document.getElementById('mConta').value.trim() || 'Principal';
+  const conta = normalizar(document.getElementById('mConta').value.trim() || 'PRINCIPAL');
   const vRaw = document.getElementById('mValor').value;
-  const cat = document.getElementById('mCategoria').value.trim();
+  const cat = normalizar(document.getElementById('mCategoria').value.trim());
   const macroLbl = document.getElementById('mMacroLabel');
   const catMacroRaw = macroLbl ? macroLbl.textContent.trim() : '';
   const catMacroPlaceholder = 'Alimentação, Moradia, Lazer...';
-  const catMacro = (catMacroRaw && catMacroRaw !== catMacroPlaceholder) ? catMacroRaw : 'Genérica';
+  const catMacro = normalizar((catMacroRaw && catMacroRaw !== catMacroPlaceholder) ? catMacroRaw : 'GENÉRICA');
   // descrição: usa o campo "Descrição" (antigo subcategoria); fallback para categoria macro
-  const desc = cat || catMacro || 'Lançamento Manual';
+  const desc = cat || catMacro || 'LANÇAMENTO MANUAL';
   const tipo = document.getElementById('mTipo').value;
   const dataRaw = document.getElementById('mData').value.trim();
-  const forma = document.getElementById('mForma').value.trim() || 'Outros';
+  const forma = normalizar(document.getElementById('mForma').value.trim() || 'OUTROS');
 
   const valor = parseBRL(vRaw);
   if (valor === 0) {
@@ -2890,7 +3047,7 @@ function salvarTransacaoManual() {
   const novoItem = {
     id:             'man-' + Math.random().toString(36).substr(2, 9),
     descricao:      desc,
-    categoria:      cat || desc,
+    categoria:      normalizar(cat || desc),
     categoriaMacro: catMacro,
     forma:          forma,
     conta:          conta,
@@ -2909,6 +3066,7 @@ function salvarTransacaoManual() {
     fecharModalTransacao();
     filtrarTabela();
     render();
+    agendarAutoSave();
   }).catch(err => console.error('Erro ao salvar lançamento manual:', err));
 }
 
@@ -3843,7 +4001,7 @@ function catIEFilter(editId) {
 function catIEKeydown(e, editId) {
   if (e.key === 'Enter') {
     const t = e.target.value.trim();
-    if (t) catIESelect(editId, t);
+    if (t) catIESelect(editId, normalizar(t));
   }
   if (e.key === 'Escape') {
     const panel = document.getElementById(editId + '_panel');
@@ -3853,7 +4011,7 @@ function catIEKeydown(e, editId) {
 
 function catIESelect(editId, cat) {
   const label = document.getElementById(editId + '_label');
-  if (label) label.textContent = cat;
+  if (label) label.textContent = normalizar(cat);
   const panel = document.getElementById(editId + '_panel');
   if (panel) panel.style.display = 'none';
 }
@@ -3861,7 +4019,7 @@ function catIESelect(editId, cat) {
 function catIESave(editId, sub) {
   const label = document.getElementById(editId + '_label');
   if (!label) return;
-  const newGrp = label.textContent.trim();
+  const newGrp = normalizar(label.textContent.trim());
   if (!newGrp) return;
 
   // Atualiza r.categoriaMacro diretamente em todos os lançamentos com r.categoria === sub
@@ -3889,6 +4047,7 @@ function catIESave(editId, sub) {
       recalcularEstruturas();
       renderAbaCategorias();
       if (csvLoaded) render();
+      agendarAutoSave();
     })
     .catch(err => console.error('Erro ao salvar mover categoria:', err));
 }
@@ -3908,7 +4067,7 @@ function fecharNovaCategoriaModal() {
 }
 
 function salvarNovaCategoria() {
-  const nome = document.getElementById('novaCatInput').value.trim();
+  const nome = normalizar(document.getElementById('novaCatInput').value.trim());
   const erroEl = document.getElementById('novaCatErro');
   if (!nome) {
     erroEl.textContent = 'O nome não pode ser vazio.';
@@ -4393,6 +4552,217 @@ async function gdriveRestaurarBackup() {
   }
 
   if (btnRestore) btnRestore.disabled = false;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TELA DE LOGIN
+// ═══════════════════════════════════════════════════════════════
+function loginSetStatus(msg, tipo) {
+  const el = document.getElementById('loginStatus');
+  if (el) { el.textContent = msg; el.className = 'login-status' + (tipo ? ' ' + tipo : ''); }
+}
+
+function fecharLoginScreen() {
+  const ls = document.getElementById('loginScreen');
+  if (ls) ls.classList.add('hidden');
+}
+
+async function loginComGoogle() {
+  const btn = document.getElementById('loginGoogleBtn');
+  const amb = verificarAmbienteGoogle();
+  if (!amb.valido) {
+    loginSetStatus('Google Drive não disponível neste ambiente. Continuando sem login.', 'err');
+    setTimeout(fecharLoginScreen, 2000);
+    return;
+  }
+  if (!gdriveTokenClient && !gdriveInitTokenClient()) {
+    loginSetStatus('Não foi possível inicializar o Google. Tente recarregar.', 'err');
+    return;
+  }
+  if (btn) btn.disabled = true;
+  loginSetStatus('Aguardando autenticação…', 'loading');
+
+  // Substitui o callback para esta sessão de login
+  gdriveTokenClient.callback = async (tokenResponse) => {
+    if (tokenResponse.error) {
+      loginSetStatus('Falha na autenticação: ' + tokenResponse.error, 'err');
+      if (btn) btn.disabled = false;
+      return;
+    }
+    gdriveAccessToken = tokenResponse.access_token;
+    await gdriveBuscarPerfil();
+    gdriveAtualizarUI(true);
+    loginSetStatus('Autenticado! Carregando seu backup…', 'loading');
+    // Restaura backup automaticamente
+    await gdriveRestaurarBackupSilencioso();
+    fecharLoginScreen();
+  };
+
+  try {
+    gdriveTokenClient.requestAccessToken({ prompt: '' });
+  } catch (e) {
+    loginSetStatus('Erro: ' + e.message, 'err');
+    if (btn) btn.disabled = false;
+  }
+}
+
+function loginSemGoogle() {
+  fecharLoginScreen();
+}
+
+// Restaura backup sem alterar UI do painel de configurações
+async function gdriveRestaurarBackupSilencioso() {
+  if (!gdriveAccessToken) return;
+  try {
+    const fileId = await gdriveBuscarFileId();
+    if (!fileId) {
+      loginSetStatus('Nenhum backup encontrado. Iniciando em branco.', '');
+      return;
+    }
+    loginSetStatus('Baixando dados do Drive…', 'loading');
+    const resp = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+      { headers: { Authorization: 'Bearer ' + gdriveAccessToken } }
+    );
+    if (!resp.ok) return;
+    const json = await resp.json();
+    if (!json.rows || !Array.isArray(json.rows) || json.rows.length === 0) return;
+
+    ALL_ROWS = json.rows;
+    recalcularEstruturas();
+    await setStoredRows(ALL_ROWS);
+
+    const banner = document.getElementById('uploadBanner');
+    if (banner) banner.classList.add('loaded');
+    const sub = document.getElementById('uploadSub');
+    if (sub) { sub.textContent = '✓ Dados restaurados do Google Drive — ' + ALL_ROWS.length.toLocaleString('pt-BR') + ' lançamentos'; sub.classList.add('ok'); }
+    csvLoaded = true;
+
+    const anosDisponiveis = ALL_ROWS.map(r => { const d = parseDate(r.data); return d ? d.getFullYear() : null; }).filter(Boolean);
+    if (anosDisponiveis.length) currentYear = Math.max(...anosDisponiveis);
+
+    FILTRO_MESES_SELECIONADOS = [];
+    render(); filtrarTabela(); renderAbaCartoes(); renderAbaCategorias();
+    loginSetStatus('✓ ' + ALL_ROWS.length.toLocaleString('pt-BR') + ' lançamentos carregados!', '');
+  } catch (e) {
+    loginSetStatus('Erro ao restaurar: ' + e.message, 'err');
+  }
+}
+
+// Exibe a tela de login ao carregar o DOM
+document.addEventListener('DOMContentLoaded', () => {
+  const ls = document.getElementById('loginScreen');
+  if (ls) ls.classList.remove('hidden');
+});
+
+// ═══════════════════════════════════════════════════════════════
+// MIGRAÇÃO: NORMALIZAR DADOS HISTÓRICOS
+// ═══════════════════════════════════════════════════════════════
+function normalizarDadosHistoricos() {
+  const btn = document.getElementById('btnNormalizar');
+  const status = document.getElementById('normalizarStatus');
+
+  if (!csvLoaded || ALL_ROWS.length === 0) {
+    status.textContent = '⚠ Nenhum dado carregado para normalizar.';
+    status.className = 'gdrive-status err';
+    return;
+  }
+
+  if (!confirm(`Isso irá normalizar (MAIÚSCULAS + remover espaços duplos) os campos de texto de ${ALL_ROWS.length.toLocaleString('pt-BR')} registros. Deseja continuar?`)) return;
+
+  if (btn) btn.disabled = true;
+  status.textContent = 'Normalizando...';
+  status.className = 'gdrive-status loading';
+
+  let alterados = 0;
+  ALL_ROWS.forEach(r => {
+    const campos = ['descricao', 'categoria', 'categoriaMacro', 'forma', 'conta'];
+    campos.forEach(campo => {
+      if (r[campo]) {
+        const normalizado = normalizar(r[campo]);
+        if (normalizado !== r[campo]) {
+          r[campo] = normalizado;
+          alterados++;
+        }
+      }
+    });
+  });
+
+  setStoredRows(ALL_ROWS).then(() => {
+    recalcularEstruturas();
+    filtrarTabela();
+    render();
+    renderAbaCategorias();
+    agendarAutoSave();
+    status.textContent = `✓ ${alterados} campo(s) normalizados em ${ALL_ROWS.length.toLocaleString('pt-BR')} registros.`;
+    status.className = 'gdrive-status ok';
+    if (btn) btn.disabled = false;
+  }).catch(err => {
+    status.textContent = '✕ Erro ao salvar: ' + err.message;
+    status.className = 'gdrive-status err';
+    if (btn) btn.disabled = false;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUTOSSALVAMENTO NO GOOGLE DRIVE
+// ═══════════════════════════════════════════════════════════════
+let autoSaveTimer = null;
+let autoSaveIndicator = null;
+
+function agendarAutoSave() {
+  if (!gdriveAccessToken) return;
+  if (autoSaveTimer) clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(async () => {
+    try {
+      await gdriveSalvarBackupSilencioso();
+    } catch (e) {
+      glog('warn', 'AutoSave falhou:', e.message);
+    }
+  }, 2000); // 2s de debounce
+}
+
+async function gdriveSalvarBackupSilencioso() {
+  if (!gdriveAccessToken || !csvLoaded || ALL_ROWS.length === 0) return;
+  mostrarIndicadorAutoSave('Salvando…');
+  try {
+    const payload = JSON.stringify({ versao: 1, dataExportacao: new Date().toISOString(), rows: ALL_ROWS });
+    const fileId = await gdriveBuscarFileId();
+    if (fileId) {
+      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
+        method: 'PATCH',
+        headers: { Authorization: 'Bearer ' + gdriveAccessToken, 'Content-Type': 'application/json' },
+        body: payload
+      });
+    } else {
+      const meta = JSON.stringify({ name: GDRIVE_FILENAME, mimeType: 'application/json' });
+      const boundary = 'autosave_' + Date.now();
+      const multipart = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${boundary}\r\nContent-Type: application/json\r\n\r\n${payload}\r\n--${boundary}--`;
+      await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + gdriveAccessToken, 'Content-Type': `multipart/related; boundary=${boundary}` },
+        body: multipart
+      });
+    }
+    mostrarIndicadorAutoSave('✓ Salvo', 2000);
+  } catch (e) {
+    mostrarIndicadorAutoSave('⚠ Falha ao salvar', 3000);
+  }
+}
+
+function mostrarIndicadorAutoSave(msg, hideAfter) {
+  let ind = document.getElementById('autoSaveInd');
+  if (!ind) {
+    ind = document.createElement('div');
+    ind.id = 'autoSaveInd';
+    ind.style.cssText = 'position:fixed;bottom:16px;right:16px;background:rgba(13,31,60,0.92);border:1px solid rgba(255,255,255,0.1);color:var(--text2);font-size:11px;padding:6px 14px;border-radius:20px;z-index:8000;pointer-events:none;transition:opacity .3s;font-family:Sora,sans-serif';
+    document.body.appendChild(ind);
+  }
+  ind.textContent = msg;
+  ind.style.opacity = '1';
+  if (hideAfter) {
+    setTimeout(() => { ind.style.opacity = '0'; }, hideAfter);
+  }
 }
 </script>
 </body>
