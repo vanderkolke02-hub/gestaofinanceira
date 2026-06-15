@@ -2920,7 +2920,7 @@ Regras:
 - descricao: nome do estabelecimento exatamente como aparece no documento, em maiúsculas. REMOVA qualquer informação de parcela da descrição (ex: "(PARCELA 08 DE 10)", "PARC 8/10", "08/10", "PARCELA 08", "CP PARC" etc). A descrição deve conter apenas o nome do estabelecimento/serviço.
 - valor: número decimal positivo, sem R$ ou separadores de milhar
 - tipo: sempre "despesa" para fatura de cartão, exceto estornos que são "receita"
-- parcela_atual e total_parcelas: extraia do texto (ex: "06/12" = atual 6, total 12). Se não houver parcela, use 1 para ambos
+- parcela_atual e total_parcelas: identifique informações de parcelamento em qualquer formato presente no documento, incluindo: "PARCELA 08 DE 10", "08/10", "PARC 8/10", "(6 DE 12)", "6X", "PARCELA 6/12". Extraia o número atual e o total como inteiros separados. Se não houver parcelamento, use 1 para ambos.
 - observacao: qualquer informação relevante que não coube nos outros campos
 - Ignore totais, subtotais, encargos de parcelamento e linhas de resumo — apenas lançamentos individuais
 - Não considerar pagamentos, apenas as despesas da fatura
