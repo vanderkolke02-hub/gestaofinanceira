@@ -1217,6 +1217,24 @@
         </div>
       </div>
 
+      <!-- ── CORREÇÃO DE TEXTOS ── -->
+      <div class="gdrive-section">
+        <div class="gdrive-section-title">🔤 Padronização de Textos</div>
+        <div class="upload-banner" style="margin:0;border-radius:8px">
+          <div class="upload-left">
+            <span class="upload-icon">🔤</span>
+            <div>
+              <div class="upload-title">Aplicar maiúsculas e remover espaços duplicados</div>
+              <div class="upload-sub">Corrige retroativamente descrição, categoria, forma e conta de todos os lançamentos já importados</div>
+            </div>
+          </div>
+          <button class="upload-btn" onclick="aplicarNormalizacaoRetroativa()">
+            🔤 Padronizar Lançamentos
+          </button>
+        </div>
+        <div id="normalizeStatus" style="margin-top:8px;font-size:11px;color:var(--muted);min-height:16px"></div>
+      </div>
+
       <!-- ── IMPORTAÇÃO VIA IA ── -->
       <div class="gdrive-section" id="aiSection">
         <div class="gdrive-section-title">
@@ -1310,11 +1328,24 @@
 <div class="modal-overlay" id="aiPreviewModal" style="display:none;opacity:0;pointer-events:none;z-index:500">
   <div class="modal-card" style="max-width:860px;width:96vw;max-height:90vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
     <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <div>
-        <div class="modal-title" style="margin-bottom:4px" id="aiPreviewTitle">Prévia da Importação</div>
-        <div style="font-size:11px;color:var(--muted)" id="aiPreviewSub">Revise, edite ou exclua lançamentos antes de confirmar.</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <div class="modal-title" style="margin-bottom:0;white-space:nowrap">Prévia —</div>
+          <input id="aiPreviewContaNome"
+            style="background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.15);
+                   color:var(--text);font-family:'Sora',sans-serif;font-size:16px;font-weight:700;
+                   outline:none;min-width:120px;width:auto;max-width:300px;padding:0 4px"
+            oninput="this.style.width=(this.value.length+2)+'ch'"
+            onchange="aiPreviewContaAtualizar(this.value)">
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="font-size:11px;color:var(--muted)" id="aiPreviewSub">Revise, edite ou exclua lançamentos antes de confirmar.</div>
+          <div style="font-size:12px;font-weight:700;color:var(--accent2);font-family:'JetBrains Mono',monospace;white-space:nowrap">
+            Total: <span id="aiPreviewTotal">R$ 0,00</span>
+          </div>
+        </div>
       </div>
-      <button onclick="fecharAiPreview()" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:16px">✕</button>
+      <button onclick="fecharAiPreview()" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:16px;flex-shrink:0;margin-left:12px">✕</button>
     </div>
     <div style="overflow-y:auto;flex:1;padding:16px 24px">
       <table style="width:100%;border-collapse:collapse" id="aiPreviewTable">
@@ -1600,28 +1631,7 @@
     
     <div class="modal-grid-2">
       <div class="modal-group">
-        <div id="mContaWrap" style="position:relative">
-          <span class="modal-label-floating" style="z-index:2">Conta</span>
-          <button id="mContaTrigger" type="button" onclick="mContaToggle()"
-            style="width:100%;background:#050b14;border:1px solid rgba(255,255,255,0.08);color:var(--text);
-                   padding:12px;border-radius:10px;font-family:inherit;font-size:13px;cursor:pointer;
-                   display:flex;justify-content:space-between;align-items:center;text-align:left;overflow:hidden;min-width:0">
-            <span id="mContaLabel" style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0">Ex: Nubank, Itaú...</span>
-            <span style="color:var(--muted);font-size:10px">▼</span>
-          </button>
-          <div id="mContaPanel" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;
-               background:#0d1f3c;border:1px solid rgba(255,255,255,0.1);border-radius:10px;
-               box-shadow:0 16px 48px rgba(0,0,0,.6);z-index:601;overflow:hidden">
-            <div style="padding:8px">
-              <input id="mContaSearch" placeholder="Buscar ou digitar nova conta..."
-                style="width:100%;background:#050b14;border:1px solid rgba(255,255,255,0.08);color:var(--text);
-                       padding:8px 10px;border-radius:7px;font-family:inherit;font-size:12px;outline:none"
-                oninput="this.value=this.value.toUpperCase().replace(/\s{2,}/g,' ');mContaFilter()"
-                onkeydown="mContaKeydown(event)">
-            </div>
-            <div id="mContaList" style="max-height:180px;overflow-y:auto;padding:4px 6px 8px"></div>
-          </div>
-        </div>
+        <input type="text" id="mConta" class="modal-input" placeholder="Ex: Nubank, Itaú..." oninput="this.value=this.value.toUpperCase().replace(/\s{2,}/g,' ')">
       </div>
       <div class="modal-group">
         <input type="text" id="mValor" class="modal-input" placeholder="Valor (R$)">
@@ -2900,35 +2910,34 @@ function parcToggleDetalhe(gi) {
 const GEMINI_KEY_STORE = 'gemini_api_key';
 let aiPreviewRows = [];
 
-const PROMPT_FATURA = `Voce e um extrator de dados financeiros. Analise esta fatura de cartao de credito em PDF e extraia TODOS os lancamentos.
-Retorne APENAS um JSON valido, sem texto adicional, sem markdown, sem explicacoes.
-Formato obrigatorio:
-{"tipo_documento":"fatura","conta":"NOME DO CARTAO","dataVencimento":"DD/MM/AAAA","lancamentos":[{"data":"DD/MM/AAAA","dataCompraCartao":"DD/MM/AAAA","descricao":"DESCRICAO EM MAIUSCULAS","valor":99.90,"tipo":"despesa","parcela_atual":1,"total_parcelas":12,"observacao":""}]}
+const PROMPT_FATURA = `Você é um extrator de dados financeiros. Analise esta fatura de cartão de crédito em PDF e extraia TODOS os lançamentos.
+Retorne APENAS um JSON válido, sem texto adicional, sem markdown, sem explicações.
+Formato obrigatório:
+{"tipo_documento":"fatura","conta":"NOME DO CARTÃO","lancamentos":[{"data":"DD/MM/AAAA","dataCompraCartao":"DD/MM/AAAA","descricao":"DESCRIÇÃO EM MAIÚSCULAS","valor":99.90,"tipo":"despesa","parcela_atual":1,"total_parcelas":12,"observacao":""}]}
 Regras:
-- conta: identifique o NOME DO BANCO OU INSTITUICAO que emitiu o cartao (ex: "CARTAO INTER", "CARTAO NUBANK", "CARTAO ITAU", "CARTAO BRADESCO"). O nome geralmente aparece no cabecalho ou logotipo do documento. NAO use o numero do cartao no campo conta. Use sempre o prefixo "CARTAO" seguido do nome do banco/instituicao.
-- dataVencimento: localize a data de vencimento da fatura no cabecalho ou resumo do documento (campo "Vencimento", "Data de Vencimento" ou similar). Formato DD/MM/AAAA. Esta data e UNICA para toda a fatura.
-- data: usar SEMPRE a data de vencimento da fatura (dataVencimento) para TODOS os lancamentos. Todos os lancamentos da mesma fatura tem a mesma data de pagamento, que e a data de vencimento do boleto. Formato DD/MM/AAAA.
-- dataCompraCartao: data em que a compra foi realizada (data de cada transacao individual), se disponivel no documento. Formato DD/MM/AAAA. Se nao disponivel, use "".
-- descricao: nome do estabelecimento exatamente como aparece no documento, em maiusculas. REMOVA qualquer informacao de parcela da descricao (ex: "(PARCELA 08 DE 10)", "PARC 8/10", "08/10", "PARCELA 08", "CP PARC" etc). A descricao deve conter apenas o nome do estabelecimento/servico.
-- valor: numero decimal positivo, sem R$ ou separadores de milhar. O valor sempre deve ser positivo independentemente do sinal no documento.
-- tipo: sempre "despesa" para lancamentos de fatura de cartao. EXCECAO: se a descricao contiver a palavra "ESTORNO" ou "ESTORNO DE COMPRA", classifique como "receita". O nome do lancamento pode conter palavras como "CREDITO" ou "IOF" e ainda assim ser uma despesa — classifique como "despesa" a menos que o valor apareca precedido de sinal "+" no proprio documento E nao seja estorno. Lancamentos precedidos de "+" no documento que NAO sejam estorno devem ser IGNORADOS e nao incluidos no JSON.
-- parcela_atual e total_parcelas: extraia do texto (ex: "06/12" = atual 6, total 12). Se nao houver parcela, use 1 para ambos
-- observacao: qualquer informacao relevante que nao coube nos outros campos
-- Ignore totais, subtotais, encargos de parcelamento e linhas de resumo — apenas lancamentos individuais
-- Nao considerar pagamentos, apenas as despesas da fatura`;
+- data: usar a data de vencimento do cartão ou de pagamento do boleto. Formato DD/MM/AAAA.
+- dataCompraCartao: data em que a compra foi realizada, se disponível no documento. Formato DD/MM/AAAA. Se não disponível, use "".
+- descricao: nome do estabelecimento exatamente como aparece no documento, em maiúsculas. REMOVA qualquer informação de parcela da descrição (ex: "(PARCELA 08 DE 10)", "PARC 8/10", "08/10", "PARCELA 08", "CP PARC" etc). A descrição deve conter apenas o nome do estabelecimento/serviço.
+- valor: número decimal positivo, sem R$ ou separadores de milhar
+- tipo: sempre "despesa" para fatura de cartão, exceto estornos que são "receita"
+- parcela_atual e total_parcelas: extraia do texto (ex: "06/12" = atual 6, total 12). Se não houver parcela, use 1 para ambos
+- observacao: qualquer informação relevante que não coube nos outros campos
+- Ignore totais, subtotais, encargos de parcelamento e linhas de resumo — apenas lançamentos individuais
+- Não considerar pagamentos, apenas as despesas da fatura
+- Use sempre o prefixo "CARTÃO" no campo conta (ex: "CARTÃO NUBANK", "CARTÃO HIPERCARD")`;
 
-const PROMPT_EXTRATO = `Voce e um extrator de dados financeiros. Analise este extrato bancario em PDF e extraia TODOS os lancamentos.
-Retorne APENAS um JSON valido, sem texto adicional, sem markdown, sem explicacoes.
-Formato obrigatorio:
-{"tipo_documento":"extrato","conta":"NOME DO BANCO OU CONTA","lancamentos":[{"data":"DD/MM/AAAA","descricao":"DESCRICAO EM MAIUSCULAS","valor":99.90,"tipo":"despesa","forma":"PIX","observacao":""}]}
+const PROMPT_EXTRATO = `Você é um extrator de dados financeiros. Analise este extrato bancário em PDF e extraia TODOS os lançamentos.
+Retorne APENAS um JSON válido, sem texto adicional, sem markdown, sem explicações.
+Formato obrigatório:
+{"tipo_documento":"extrato","conta":"NOME DO BANCO OU CONTA","lancamentos":[{"data":"DD/MM/AAAA","descricao":"DESCRIÇÃO EM MAIÚSCULAS","valor":99.90,"tipo":"despesa","forma":"PIX","observacao":""}]}
 Regras:
 - data: sempre no formato DD/MM/AAAA
-- descricao: exatamente como aparece no documento, em maiusculas
-- valor: numero decimal positivo, sem R$ ou separadores de milhar
-- tipo: "despesa" para debitos/saidas, "receita" para creditos/entradas
-- forma: extraia do documento quando disponivel (PIX, TED, DOC, DEBITO AUTOMATICO, TARIFA, etc). Se nao houver, use "NAO INFORMADA"
-- observacao: qualquer informacao relevante que nao coube nos outros campos
-- Ignore saldo anterior, saldo final e linhas de resumo — apenas lancamentos individuais`;
+- descricao: exatamente como aparece no documento, em maiúsculas
+- valor: número decimal positivo, sem R$ ou separadores de milhar
+- tipo: "despesa" para débitos/saídas, "receita" para créditos/entradas
+- forma: extraia do documento quando disponível (PIX, TED, DOC, DÉBITO AUTOMÁTICO, TARIFA, etc). Se não houver, use "NÃO INFORMADA"
+- observacao: qualquer informação relevante que não coube nos outros campos
+- Ignore saldo anterior, saldo final e linhas de resumo — apenas lançamentos individuais`;
 
 async function carregarGeminiKey() {
   try {
@@ -3037,32 +3046,14 @@ async function processarPdfIA(input, modo) {
       throw new Error('O Gemini não retornou lançamentos válidos.');
     }
 
-    // Para faturas, garante que todos os lancamentos usem a data de vencimento como fallback
-    const dataVencimentoFatura = modo === 'fatura' ? normalizeText(parsed.dataVencimento || '') : '';
-
-    // Filtro JS como segunda camada: descarta apenas lancamentos que o Gemini classificou
-    // como receita E que nao sejam estorno E nao contenham palavras tipicas de despesa no nome
-    const KEYWORDS_DESPESA = ['IOF', 'JUROS', 'MULTA', 'TARIFA', 'ANUIDADE', 'SEGURO', 'PARCELA', 'PARC', 'CRED PARCELADO', 'CREDITO PARCELADO'];
-    const lancamentosFiltrados = modo === 'fatura'
-      ? parsed.lancamentos.filter(l => {
-          const tipo = (l.tipo || '').toLowerCase();
-          const desc = (l.descricao || '').toUpperCase();
-          const ehEstorno = desc.includes('ESTORNO');
-          const ehDespesaConhecida = KEYWORDS_DESPESA.some(k => desc.includes(k));
-          // So descarta se for receita, nao for estorno E nao tiver palavra tipica de despesa
-          if (tipo === 'receita' && !ehEstorno && !ehDespesaConhecida) return false;
-          return true;
-        })
-      : parsed.lancamentos;
-
-    aiPreviewRows = lancamentosFiltrados.map((l, i) => ({
+    aiPreviewRows = parsed.lancamentos.map((l, i) => ({
       _id: 'ai-' + i,
-      data: normalizeText(l.data || '') || dataVencimentoFatura,
+      data: normalizeText(l.data || ''),
       dataCompraCartao: normalizeText(l.dataCompraCartao || ''),
-      descricao: normalizeText(cleanDescricao(l.descricao || 'SEM DESCRICAO')),
+      descricao: normalizeText(cleanDescricao(l.descricao || 'SEM DESCRIÇÃO')),
       valor: parseFloat(l.valor) || 0,
       tipo: l.tipo === 'receita' ? 'receita' : 'despesa',
-      forma: normalizeText(l.forma || (modo === 'fatura' ? 'CARTAO' : 'NAO INFORMADA')),
+      forma: normalizeText(l.forma || (modo === 'fatura' ? 'CARTÃO' : 'NÃO INFORMADA')),
       conta: normalizeText(parsed.conta || ''),
       observacao: l.observacao || '',
       parcela_atual: l.parcela_atual || 1,
@@ -3080,13 +3071,61 @@ async function processarPdfIA(input, modo) {
 
 function abrirAiPreview(modo, conta) {
   const modal = document.getElementById('aiPreviewModal');
-  const title = document.getElementById('aiPreviewTitle');
-  const sub   = document.getElementById('aiPreviewSub');
-  title.textContent = modo === 'fatura' ? `Prévia — Fatura ${conta}` : `Prévia — Extrato ${conta}`;
-  sub.textContent   = `${aiPreviewRows.length} lançamentos extraídos. Edite inline, exclua os incorretos e confirme.`;
+  const contaInput = document.getElementById('aiPreviewContaNome');
+  const sub = document.getElementById('aiPreviewSub');
+  if (contaInput) {
+    contaInput.value = conta;
+    contaInput.style.width = (conta.length + 2) + 'ch';
+  }
+  sub.textContent = `${aiPreviewRows.length} lançamentos extraídos. Edite inline, exclua os incorretos e confirme.`;
   renderAiPreviewTable();
   modal.style.display = 'flex';
   requestAnimationFrame(() => { modal.style.opacity = '1'; modal.style.pointerEvents = 'auto'; });
+}
+
+function aiPreviewContaAtualizar(val) {
+  const nome = normalizeText(val);
+  aiPreviewRows.forEach(r => r.conta = nome);
+}
+
+function aiPreviewAtualizarTotal() {
+  const total = aiPreviewRows.reduce((s, r) => s + (r.tipo === 'despesa' ? r.valor : -r.valor), 0);
+  const el = document.getElementById('aiPreviewTotal');
+  if (el) el.textContent = money(Math.abs(total));
+}
+
+// Aplica normalizeText retroativamente em todos os lançamentos já importados
+function aplicarNormalizacaoRetroativa() {
+  if (!ALL_ROWS.length) {
+    document.getElementById('normalizeStatus').textContent = 'Nenhum lançamento carregado.';
+    return;
+  }
+  if (!confirm(`Aplicar maiúsculas e remover espaços duplicados em ${ALL_ROWS.length} lançamento(s)?\n\nCampos afetados: Descrição, Categoria, Categoria Macro, Forma e Conta.`)) return;
+
+  let alterados = 0;
+  ALL_ROWS.forEach(r => {
+    const antes = JSON.stringify([r.descricao, r.categoria, r.categoriaMacro, r.forma, r.conta]);
+    r.descricao      = normalizeText(r.descricao);
+    r.categoria       = normalizeText(r.categoria);
+    r.categoriaMacro  = r.categoriaMacro ? normalizeText(r.categoriaMacro) : r.categoriaMacro;
+    r.forma           = normalizeText(r.forma);
+    r.conta           = normalizeText(r.conta);
+    const depois = JSON.stringify([r.descricao, r.categoria, r.categoriaMacro, r.forma, r.conta]);
+    if (antes !== depois) alterados++;
+  });
+
+  setStoredRows(ALL_ROWS).then(() => {
+    recalcularEstruturas();
+    filtrarTabela();
+    render();
+    if (document.getElementById('tab-lancamentos')?.classList.contains('active')) renderAbaCategorias();
+    document.getElementById('normalizeStatus').textContent = `${alterados} de ${ALL_ROWS.length} lançamento(s) atualizados.`;
+    document.getElementById('normalizeStatus').style.color = 'var(--accent)';
+  }).catch(err => {
+    console.error('Erro ao normalizar lançamentos:', err);
+    document.getElementById('normalizeStatus').textContent = 'Erro ao salvar alterações.';
+    document.getElementById('normalizeStatus').style.color = 'var(--danger)';
+  });
 }
 
 function fecharAiPreview() {
@@ -3103,6 +3142,7 @@ function renderAiPreviewTable() {
   if (!tbody) return;
 
   count.textContent = `${aiPreviewRows.length} lançamento(s) para importar`;
+  aiPreviewAtualizarTotal();
 
   const cellStyle = `padding:6px 8px;font-size:12px;border-bottom:1px solid var(--border);`;
   const inputStyle = `background:transparent;border:none;color:var(--text);font-family:'Sora',sans-serif;font-size:12px;width:100%;outline:none;`;
@@ -3127,7 +3167,7 @@ function renderAiPreviewTable() {
       </td>
       <td style="${cellStyle}width:80px">
         <input style="${inputStyle}text-align:right" value="${r.valor.toFixed(2).replace('.',',')}"
-          oninput="aiPreviewRows[${i}].valor=parseBRL(this.value)">
+          oninput="aiPreviewRows[${i}].valor=parseBRL(this.value);aiPreviewAtualizarTotal()">
       </td>
       <td style="${cellStyle}width:80px">
         <select style="${inputStyle}cursor:pointer" onchange="aiPreviewRows[${i}].tipo=this.value">
@@ -3600,12 +3640,6 @@ function abrirModalTransacao() {
   document.getElementById('mCategoria').value = '';
   document.getElementById('mForma').value = '';
   document.getElementById('mTipo').value = 'despesa';
-  // reset do dropdown de conta
-  const contaLbl = document.getElementById('mContaLabel');
-  if (contaLbl) { contaLbl.textContent = 'Ex: Nubank, Itaú...'; contaLbl.style.color = 'var(--muted)'; }
-  const contaPanelReset = document.getElementById('mContaPanel');
-  if (contaPanelReset) contaPanelReset.style.display = 'none';
-  mContaOpen = false;
   // reset do dropdown de categoria macro
   const lbl = document.getElementById('mMacroLabel');
   if (lbl) { lbl.textContent = 'Alimentação, Moradia, Lazer...'; lbl.style.color = 'var(--muted)'; }
@@ -3692,88 +3726,6 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// ── DROPDOWN CONTA — MODAL NOVA TRANSAÇÃO ──
-let mContaOpen = false;
-
-function getContasCadastradas() {
-  // Coleta todas as contas únicas já cadastradas nos lançamentos
-  const contas = [...new Set(ALL_ROWS.map(r => r.conta).filter(Boolean))].sort();
-  return contas;
-}
-
-function mContaToggle() {
-  const panel = document.getElementById('mContaPanel');
-  if (!panel) return;
-  mContaOpen = panel.style.display !== 'none' ? false : true;
-  panel.style.display = mContaOpen ? 'block' : 'none';
-  if (mContaOpen) {
-    const s = document.getElementById('mContaSearch');
-    if (s) { s.value = ''; s.focus(); }
-    mContaRenderList('');
-  }
-}
-
-function mContaRenderList(termo) {
-  const list = document.getElementById('mContaList');
-  if (!list) return;
-  const contas = getContasCadastradas();
-  const t = termo.trim().toLowerCase();
-  const filtradas = t ? contas.filter(c => c.toLowerCase().includes(t)) : contas;
-  const currentLbl = (document.getElementById('mContaLabel') || {}).textContent || '';
-  let html = '';
-  if (filtradas.length > 0) {
-    html += `<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:4px 6px 2px">Contas disponíveis</div>`;
-    filtradas.forEach(c => {
-      const active = c === currentLbl ? 'background:rgba(0,200,150,0.15);color:var(--accent);' : '';
-      html += `<div onclick="mContaSelect('${escapeHTML(c).replace(/'/g,"\'")}');event.stopPropagation()"
-        style="padding:7px 10px;border-radius:6px;cursor:pointer;font-size:12px;${active}">🏦 ${escapeHTML(c)}</div>`;
-    });
-  }
-  const termoBruto = termo.trim();
-  const exato = contas.some(c => c.toLowerCase() === termoBruto.toLowerCase());
-  if (termoBruto && !exato) {
-    html += `<div onclick="mContaSelect('${escapeHTML(termoBruto).replace(/'/g,"\'")}');event.stopPropagation()"
-      style="padding:7px 10px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--accent2)">+ Criar "${escapeHTML(termoBruto)}"</div>`;
-  }
-  if (!html) html = `<div style="padding:8px 10px;font-size:11px;color:var(--muted)">Nenhuma conta encontrada. Digite para criar.</div>`;
-  list.innerHTML = html;
-}
-
-function mContaFilter() {
-  const s = document.getElementById('mContaSearch');
-  if (s) mContaRenderList(s.value);
-}
-
-function mContaKeydown(e) {
-  if (e.key === 'Enter') {
-    const t = e.target.value.trim();
-    if (t) mContaSelect(t);
-  }
-  if (e.key === 'Escape') {
-    const panel = document.getElementById('mContaPanel');
-    if (panel) panel.style.display = 'none';
-    mContaOpen = false;
-  }
-}
-
-function mContaSelect(conta) {
-  const lbl = document.getElementById('mContaLabel');
-  const normalized = normalizeText(conta);
-  if (lbl) { lbl.textContent = normalized; lbl.style.color = 'var(--text)'; }
-  const panel = document.getElementById('mContaPanel');
-  if (panel) panel.style.display = 'none';
-  mContaOpen = false;
-}
-
-document.addEventListener('click', function(e) {
-  const wrap = document.getElementById('mContaWrap');
-  if (mContaOpen && wrap && !wrap.contains(e.target)) {
-    const panel = document.getElementById('mContaPanel');
-    if (panel) panel.style.display = 'none';
-    mContaOpen = false;
-  }
-});
-
 function fecharModalTransacao() {
   document.getElementById('txModal').classList.remove('active');
 }
@@ -3791,10 +3743,7 @@ function atualizarModalBadge() {
 }
 
 function salvarTransacaoManual() {
-  const mContaLbl = document.getElementById('mContaLabel');
-  const mContaPlaceholder = 'Ex: Nubank, Itaú...';
-  const contaRaw = (mContaLbl && mContaLbl.textContent.trim() !== mContaPlaceholder) ? mContaLbl.textContent.trim() : '';
-  const conta = normalizeText(contaRaw) || 'PRINCIPAL';
+  const conta = normalizeText(document.getElementById('mConta').value) || 'PRINCIPAL';
   const vRaw = document.getElementById('mValor').value;
   const cat = normalizeText(document.getElementById('mCategoria').value);
   const macroLbl = document.getElementById('mMacroLabel');
