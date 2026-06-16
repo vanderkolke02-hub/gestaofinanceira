@@ -1310,7 +1310,7 @@
 
   <!-- ── ABA PARCELAMENTOS ── -->
   <div id="tab-parcelamentos" class="tab-content">
-    <div id="parcKpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px"></div>
+    <div id="parcKpis" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px"></div>
     <div id="parcProgressBar" style="margin-bottom:16px"></div>
     <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
       <button id="parcBtnAtivo" onclick="parcSetFiltro('ativo')"
@@ -2770,23 +2770,50 @@ function getParcelamentos() {
     g.parcelas_importadas.sort((a, b) => (a.parcela_atual || 1) - (b.parcela_atual || 1));
     // Última parcela importada = referência para projeção
     const ultima = g.parcelas_importadas[g.parcelas_importadas.length - 1];
+    const primeira = g.parcelas_importadas[0];
     const parcAtual = ultima.parcela_atual || 1;
     const dtRef = new Date(ultima.data + 'T12:00:00');
     g.parcela_referencia = parcAtual;
     g.data_referencia = dtRef;
-    g.valor_total_estimado = round2(g.valor_parcela * g.total_parcelas);
-    g.pago = round2(g.valor_parcela * g.parcelas_importadas.length);
+
+    // Valor médio das parcelas importadas (usado para simular as anteriores e projetar as futuras)
+    const somaImportadas = round2(g.parcelas_importadas.reduce((s, p) => s + p.valor, 0));
+    g.valor_parcela_media = round2(somaImportadas / g.parcelas_importadas.length);
+    g.valor_total_estimado = round2(g.valor_parcela_media * g.total_parcelas);
+
+    // Simula parcelas anteriores à primeira efetivamente importada (não registradas no dashboard)
+    g.parcelas_simuladas = [];
+    const primeiraNum = primeira.parcela_atual || 1;
+    if (primeiraNum > 1) {
+      const dtPrimeiraImportada = new Date(primeira.data + 'T12:00:00');
+      for (let i = 1; i < primeiraNum; i++) {
+        const mesesAtras = primeiraNum - i;
+        const dtSim = new Date(dtPrimeiraImportada);
+        dtSim.setMonth(dtSim.getMonth() - mesesAtras);
+        g.parcelas_simuladas.push({ num: i, data: dtSim, valor: g.valor_parcela_media, simulada: true });
+      }
+    }
+    const somaSimuladas = round2(g.parcelas_simuladas.reduce((s, p) => s + p.valor, 0));
+
+    // PAGO = soma das parcelas importadas + parcelas simuladas anteriores (estimadas)
+    g.pago = round2(somaImportadas + somaSimuladas);
     g.restante = round2(g.valor_total_estimado - g.pago);
-    g.pct = Math.round((g.pago / g.valor_total_estimado) * 100);
+    g.pct = g.valor_total_estimado > 0 ? Math.round((g.pago / g.valor_total_estimado) * 100) : 0;
     g.finalizado = parcAtual >= g.total_parcelas;
-    // Projeta parcelas futuras
+
+    // Projeta parcelas futuras usando o valor médio das parcelas já importadas
     g.parcelas_projetadas = [];
     for (let i = parcAtual + 1; i <= g.total_parcelas; i++) {
       const mesesAFrente = i - parcAtual;
       const dtProj = new Date(dtRef);
       dtProj.setMonth(dtProj.getMonth() + mesesAFrente);
-      g.parcelas_projetadas.push({ num: i, data: dtProj, valor: g.valor_parcela });
+      g.parcelas_projetadas.push({ num: i, data: dtProj, valor: g.valor_parcela_media });
     }
+
+    // Valor a pagar do mês: próxima parcela pendente (primeira da lista de futuras), ou null se finalizado
+    g.valor_mes_atual = g.parcelas_projetadas.length > 0 ? g.parcelas_projetadas[0].valor : null;
+    g.data_mes_atual  = g.parcelas_projetadas.length > 0 ? g.parcelas_projetadas[0].data : null;
+
     // Última data
     if (g.parcelas_projetadas.length > 0) {
       g.ultima_data = g.parcelas_projetadas[g.parcelas_projetadas.length - 1].data;
@@ -2819,11 +2846,14 @@ function renderParcelamentos() {
   const ultimaData = emAndamento.reduce((max, g) => g.ultima_data > max ? g.ultima_data : max, new Date(0));
   const ultimaDataFmt = ultimaData > new Date(0) ? ultimaData.toLocaleDateString('pt-BR', {month:'long',year:'numeric'}) : '—';
 
+  const totalMesAtual = emAndamento.reduce((s, g) => s + (g.valor_mes_atual || 0), 0);
+
   kpisEl.innerHTML = `
     <div class="kpi-card"><div class="kpi-label">EM ANDAMENTO</div><div class="kpi-value" style="font-size:28px">${emAndamento.length}</div><div class="kpi-sub">compras parceladas</div></div>
     <div class="kpi-card"><div class="kpi-label">VALOR TOTAL (ESTIMADO)</div><div class="kpi-value">${money(totalEstimado)}</div></div>
     <div class="kpi-card"><div class="kpi-label">JÁ PAGO</div><div class="kpi-value" style="color:var(--accent)">${money(totalPago)}</div></div>
-    <div class="kpi-card"><div class="kpi-label">RESTANTE</div><div class="kpi-value" style="color:var(--danger)">${money(totalRestante)}</div></div>`;
+    <div class="kpi-card"><div class="kpi-label">RESTANTE</div><div class="kpi-value" style="color:var(--danger)">${money(totalRestante)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">A PAGAR ESTE MÊS</div><div class="kpi-value" style="color:var(--accent2)">${money(totalMesAtual)}</div></div>`;
 
   progEl.innerHTML = `
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px">
@@ -2847,7 +2877,7 @@ function renderParcelamentos() {
     const badge = g.finalizado
       ? `<span class="parc-badge parc-badge-finalizado">Finalizado</span>`
       : `<span class="parc-badge parc-badge-ativo">Ativo</span>`;
-    const meses = g.valor_parcela > 0 ? `R$ ${g.valor_parcela.toFixed(2).replace('.',',')}/ mês` : '';
+    const meses = g.valor_parcela_media > 0 ? `R$ ${g.valor_parcela_media.toFixed(2).replace('.',',')}/ mês` : '';
 
     // Linha de cada parcela importada (pagas/atual)
     const linhasPagas = g.parcelas_importadas.map(p => {
@@ -2865,6 +2895,16 @@ function renderParcelamentos() {
       </div>`;
     }).join('');
 
+    // Parcelas simuladas (anteriores à primeira importada, não registradas como lançamento real)
+    const linhasSimuladas = g.parcelas_simuladas.map(p => {
+      const dtFmt = p.data.toLocaleDateString('pt-BR');
+      return `<div class="parc-parcela-row parc-parcela-paga" style="opacity:.55">
+        <span class="parc-parcela-num" style="color:var(--muted)">${p.num}/${g.total_parcelas}</span>
+        <span class="parc-parcela-data">${dtFmt} <span style="font-size:9px;color:var(--muted)">(estimada)</span></span>
+        <span class="parc-parcela-val" style="color:var(--muted)">${money(p.valor)}</span>
+      </div>`;
+    }).join('');
+
     // Parcelas futuras projetadas
     const linhasFuturas = g.parcelas_projetadas.map(p => {
       const dtFmt = p.data.toLocaleDateString('pt-BR');
@@ -2874,6 +2914,8 @@ function renderParcelamentos() {
         <span class="parc-parcela-val" style="color:var(--text2)">${money(p.valor)}</span>
       </div>`;
     }).join('');
+
+    const mesAtualFmt = g.data_mes_atual ? g.data_mes_atual.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}) : '—';
 
     return `
     <div class="parc-card">
@@ -2895,14 +2937,15 @@ function renderParcelamentos() {
       </div>
       <div class="parc-bar-wrap"><div class="parc-bar-fill" style="width:${g.pct}%"></div></div>
       <div class="parc-detail" id="parcDetail${gi}">
-        <div class="parc-kpi-row">
+        <div class="parc-kpi-row" style="grid-template-columns:repeat(5,1fr)">
           <div class="parc-kpi"><div class="parc-kpi-lbl">Total estimado</div><div class="parc-kpi-val">${money(g.valor_total_estimado)}</div></div>
           <div class="parc-kpi"><div class="parc-kpi-lbl">Pago</div><div class="parc-kpi-val" style="color:var(--accent)">${money(g.pago)}</div></div>
           <div class="parc-kpi"><div class="parc-kpi-lbl">Restante</div><div class="parc-kpi-val" style="color:var(--danger)">${money(g.restante)}</div></div>
+          <div class="parc-kpi"><div class="parc-kpi-lbl">A pagar este mês</div><div class="parc-kpi-val" style="color:var(--accent2)">${g.valor_mes_atual!=null?money(g.valor_mes_atual):'—'}</div></div>
           <div class="parc-kpi"><div class="parc-kpi-lbl">Última parcela</div><div class="parc-kpi-val" style="font-size:11px;font-family:inherit">${g.ultima_data.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</div></div>
         </div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600">PARCELAS</div>
-        <div class="parc-parcelas">${linhasPagas}${linhasFuturas}</div>
+        <div class="parc-parcelas">${linhasSimuladas}${linhasPagas}${linhasFuturas}</div>
       </div>
     </div>`;
   }).join('');
@@ -3651,6 +3694,7 @@ function salvarEdicaoDrawer() {
     recalcularEstruturas();
     filtrarTabela();
     if (csvLoaded) render();
+    if (document.getElementById('tab-parcelamentos')?.classList.contains('active')) renderParcelamentos();
     cancelarEdicaoDrawer();
     agendarAutoSave();
   }).catch(err => console.error('Erro ao salvar edição:', err));
