@@ -2738,12 +2738,20 @@ function parcSetFiltro(f) {
 }
 
 function getParcelamentos() {
-  // Agrupa lançamentos parcelados pelo nome base (sem parcela no nome)
+  // Agrupa lançamentos parcelados por uma chave robusta que evita colisão entre compras diferentes
   const parcelados = ALL_ROWS.filter(r => r.total_parcelas > 1 && r.tipo === 'despesa');
   const grupos = {};
   parcelados.forEach(r => {
-    // Chave de agrupamento: descricao + conta + total_parcelas
-    const chave = `${r.descricao}||${r.conta}||${r.total_parcelas}`;
+    // Calcula a data estimada da 1ª parcela (projeção inversa a partir da parcela atual)
+    // Isso mantém a chave estável entre importações de meses diferentes da mesma compra
+    const dtAtual = new Date(r.data + 'T12:00:00');
+    const parcAtualNum = r.parcela_atual || 1;
+    const dtPrimeira = new Date(dtAtual);
+    dtPrimeira.setMonth(dtPrimeira.getMonth() - (parcAtualNum - 1));
+    const dtPrimeiraStr = dtPrimeira.toISOString().slice(0, 7); // AAAA-MM, tolera variação de dia
+
+    // Chave: data da 1ª parcela (mês) + descricao + conta + total_parcelas + valor_parcela
+    const chave = `${dtPrimeiraStr}||${r.descricao}||${r.conta}||${r.total_parcelas}||${r.valor.toFixed(2)}`;
     if (!grupos[chave]) {
       grupos[chave] = {
         chave,
@@ -2850,6 +2858,10 @@ function renderParcelamentos() {
         <span class="parc-parcela-num">${p.parcela_atual}/${g.total_parcelas}</span>
         <span class="parc-parcela-data">${dtFmt}</span>
         <span class="parc-parcela-val" style="color:${isAtual?'var(--accent)':'var(--muted)'}">${money(p.valor)}</span>
+        <button onclick="event.stopPropagation();abrirDrawerDetalhe('${p.id}', event)"
+          title="Editar esta parcela"
+          style="background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text2);
+                 width:22px;height:22px;border-radius:5px;cursor:pointer;font-size:11px;margin-left:8px;flex-shrink:0">✏️</button>
       </div>`;
     }).join('');
 
@@ -3330,6 +3342,11 @@ function renderDrawerVisualizar(item) {
     </div>`;
 }
 
+function toggleParcelamentoFields() {
+  const checked = document.getElementById('edParcelamento').checked;
+  document.getElementById('parcelamentoFields').style.display = checked ? 'grid' : 'none';
+}
+
 function ativarEdicaoDrawer() {
   const item = ALL_ROWS.find(x => x.id === drawerItemId);
   if (!item) return;
@@ -3403,13 +3420,23 @@ function renderDrawerEdicao(item) {
     </div>
     <div class="txd-toggle-row">
       <div class="txd-toggle-info">
-        <div class="txd-toggle-lbl">↺ Marcar como assinatura</div>
-        <div class="txd-toggle-sub">Transações recorrentes aparecerão na tela de assinaturas</div>
+        <div class="txd-toggle-lbl">↺ Marcar como parcelamento</div>
+        <div class="txd-toggle-sub">Informe em qual parcela está e o total de parcelas</div>
       </div>
       <label class="txd-switch">
-        <input type="checkbox" id="edAssinatura" ${item.assinatura?'checked':''}>
+        <input type="checkbox" id="edParcelamento" ${item.total_parcelas > 1 ? 'checked' : ''} onchange="toggleParcelamentoFields()">
         <span class="txd-slider"></span>
       </label>
+    </div>
+    <div id="parcelamentoFields" style="display:${item.total_parcelas > 1 ? 'grid' : 'none'};grid-template-columns:1fr 1fr;gap:12px;margin-top:-6px">
+      <div class="txd-field">
+        <label class="txd-label">Parcela Atual</label>
+        <input class="txd-input" id="edParcelaAtual" type="number" min="1" value="${item.parcela_atual || 1}">
+      </div>
+      <div class="txd-field">
+        <label class="txd-label">Total de Parcelas</label>
+        <input class="txd-input" id="edTotalParcelas" type="number" min="1" value="${item.total_parcelas || 1}">
+      </div>
     </div>`;
 
   // popula a lista de categorias e macro
@@ -3606,7 +3633,14 @@ function salvarEdicaoDrawer() {
   item.categoria        = document.getElementById('catTriggerLabel').textContent.trim() || item.categoria;
   item.categoriaMacro   = document.getElementById('macroTriggerLabel').textContent.trim() || item.categoriaMacro;
   item.tipo             = document.getElementById('edTipo').value;
-  item.assinatura       = document.getElementById('edAssinatura').checked;
+  const edParcelamento  = document.getElementById('edParcelamento');
+  if (edParcelamento && edParcelamento.checked) {
+    item.parcela_atual  = parseInt(document.getElementById('edParcelaAtual').value) || 1;
+    item.total_parcelas = parseInt(document.getElementById('edTotalParcelas').value) || 1;
+  } else {
+    item.parcela_atual  = 1;
+    item.total_parcelas = 1;
+  }
   const edDataCompra    = document.getElementById('edDataCompra');
   if (edDataCompra) {
     const dtC = parseDate(edDataCompra.value.trim());
