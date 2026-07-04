@@ -1539,6 +1539,28 @@
       </div>
     </div>
 
+    <!-- TOGGLE TIPO -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <button id="catTipoBtn-despesa" onclick="setCatTipo('despesa')"
+        style="display:flex;align-items:center;gap:6px;border:1.5px solid var(--danger);border-radius:20px;
+               padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;
+               background:rgba(244,63,94,0.15);color:var(--danger)">
+        ↓ Despesas
+      </button>
+      <button id="catTipoBtn-receita" onclick="setCatTipo('receita')"
+        style="display:flex;align-items:center;gap:6px;border:1.5px solid var(--border);border-radius:20px;
+               padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;
+               background:rgba(255,255,255,0.04);color:var(--muted)">
+        ↑ Receitas
+      </button>
+      <button id="catTipoBtn-ambos" onclick="setCatTipo('ambos')"
+        style="display:flex;align-items:center;gap:6px;border:1.5px solid var(--border);border-radius:20px;
+               padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;
+               background:rgba(255,255,255,0.04);color:var(--muted)">
+        ⇅ Ambos
+      </button>
+    </div>
+
     <!-- DONUT + LISTA -->
     <div class="cat-aba-donut-row">
       <div class="cat-aba-donut-panel">
@@ -4650,6 +4672,33 @@ const CAT_ICONS = {
   'Serviços Digitais':'💻','Finanças':'💰','Moradia':'🏠','Educação':'📚',
 };
 
+// ── FILTRO DE TIPO NA ABA CATEGORIAS ──
+let catTipo = 'despesa'; // 'despesa' | 'receita' | 'ambos'
+
+function setCatTipo(tipo) {
+  catTipo = tipo;
+  const tipos = ['despesa', 'receita', 'ambos'];
+  const configs = {
+    despesa: { bg: 'rgba(244,63,94,0.15)', border: 'var(--danger)', color: 'var(--danger)' },
+    receita: { bg: 'rgba(0,200,150,0.15)', border: 'var(--accent)', color: 'var(--accent)' },
+    ambos:   { bg: 'rgba(14,165,233,0.15)', border: 'var(--accent2)', color: 'var(--accent2)' },
+  };
+  tipos.forEach(t => {
+    const btn = document.getElementById('catTipoBtn-' + t);
+    if (!btn) return;
+    if (t === tipo) {
+      btn.style.background = configs[t].bg;
+      btn.style.borderColor = configs[t].border;
+      btn.style.color = configs[t].color;
+    } else {
+      btn.style.background = 'rgba(255,255,255,0.04)';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.color = 'var(--muted)';
+    }
+  });
+  renderAbaCategorias();
+}
+
 function renderAbaCategorias() {
   // Sem dados: limpa tudo e exibe estado vazio
   if (!csvLoaded || ALL_ROWS.length === 0) {
@@ -4678,13 +4727,21 @@ function renderAbaCategorias() {
   document.getElementById('catPeriodSub').textContent = `gasto em ${nomeMesLongo} de ${anoStr}`;
 
   const rows = ALL_ROWS.filter(r => {
-    if (r.tipo !== 'despesa' || r.oculto) return false;
+    if (r.oculto) return false;
+    if (catTipo === 'despesa' && r.tipo !== 'despesa') return false;
+    if (catTipo === 'receita' && r.tipo !== 'receita') return false;
     const d = parseDate(r.data);
     return d && d.getFullYear() === anoN && (d.getMonth()+1) === mesN;
   });
 
-  const totalDesp = rows.reduce((s, r) => s + r.valor, 0);
-  document.getElementById('catHeroTotal').textContent = money(totalDesp);
+  const totalDesp = rows.filter(r => r.tipo === 'despesa').reduce((s, r) => s + r.valor, 0);
+  const totalRec  = rows.filter(r => r.tipo === 'receita').reduce((s, r) => s + r.valor, 0);
+  const heroVal   = catTipo === 'receita' ? totalRec : catTipo === 'ambos' ? (totalRec - totalDesp) : totalDesp;
+  const heroLbl   = document.getElementById('catPeriodSub');
+  const labelMap  = { despesa: `gasto em ${nomeMesLongo} de ${anoStr}`, receita: `recebido em ${nomeMesLongo} de ${anoStr}`, ambos: `saldo em ${nomeMesLongo} de ${anoStr}` };
+  if (heroLbl) heroLbl.textContent = labelMap[catTipo];
+  document.getElementById('catHeroTotal').textContent = money(Math.abs(heroVal));
+  document.getElementById('catHeroTotal').style.color = catTipo === 'receita' ? 'var(--accent)' : catTipo === 'ambos' ? (heroVal >= 0 ? 'var(--accent)' : 'var(--danger)') : 'var(--danger)';
 
   // Agrupa: CAT_MAP tem prioridade, depois categoriaMacro (se não for valor bloqueado), depois keywords
   const grupos = {};
@@ -4698,7 +4755,7 @@ function renderAbaCategorias() {
     } else {
       grp = getCatGroup(sub);
     }
-    if (!grupos[grp]) grupos[grp] = { total: 0, subs: {} };
+    if (!grupos[grp]) grupos[grp] = { total: 0, subs: {}, tipo: r.tipo };
     grupos[grp].total = round2(grupos[grp].total + r.valor);
     grupos[grp].subs[sub] = round2((grupos[grp].subs[sub] || 0) + r.valor);
   });
@@ -4729,25 +4786,36 @@ function renderAbaCategorias() {
 
   const lista = document.getElementById('catAbaList');
   if (arrGrupos.length === 0) {
-    lista.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📂</div><div class="empty-state-text">Sem despesas neste mês</div></div>';
+    const msgs = { despesa: 'Sem despesas neste mês', receita: 'Sem receitas neste mês', ambos: 'Sem lançamentos neste mês' };
+    lista.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📂</div><div class="empty-state-text">${msgs[catTipo]}</div></div>`;
     return;
   }
 
   lista.innerHTML = '';
+  const totalGrupos = rows.reduce((s, r) => s + r.valor, 0) || 1;
   const maxGrp = arrGrupos[0][1].total || 1;
 
   arrGrupos.forEach(([grpNome, grpData], gi) => {
     const cor = CAT_COLORS[gi % CAT_COLORS.length];
     const icon = CAT_ICONS[grpNome] || '📦';
-    const pct = ((grpData.total / totalDesp) * 100).toFixed(1);
+    const pct = ((grpData.total / totalGrupos) * 100).toFixed(1);
     const barPct = ((grpData.total / maxGrp) * 100).toFixed(1);
     const subsArr = Object.entries(grpData.subs).sort((a,b)=>b[1]-a[1]);
+    // No modo "ambos", mostra tag de tipo do grupo
+    const tipoGrp = grpData.tipo || 'despesa';
+    const tipoTag = catTipo === 'ambos'
+      ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:4px;
+           background:${tipoGrp==='receita'?'rgba(0,200,150,0.15)':'rgba(244,63,94,0.12)'};
+           color:${tipoGrp==='receita'?'var(--accent)':'var(--danger)'}">
+           ${tipoGrp==='receita'?'↑ Receita':'↓ Despesa'}</span>`
+      : '';
     const card = document.createElement('div');
     card.className = 'cat-group-card';
     card.innerHTML = `
       <div class="cat-group-header" onclick="this.parentElement.classList.toggle('open')">
         <div class="cat-group-badge" style="background:${cor}22;color:${cor}">${icon}</div>
         <span class="cat-group-name">${escapeHTML(grpNome)}</span>
+        ${tipoTag}
         <span class="cat-group-count">${subsArr.length} sub</span>
         <span class="cat-group-amount">${money(grpData.total)}</span>
         <span class="cat-group-pct">${pct}%</span>
