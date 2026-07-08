@@ -1526,7 +1526,7 @@
     <!-- HERO TOTAL -->
     <div class="cat-aba-hero">
       <div>
-        <div class="cat-aba-hero-lbl">💸 Total gasto no período</div>
+        <div class="cat-aba-hero-lbl" id="catHeroLbl">💸 Total gasto no período</div>
         <div class="cat-aba-hero-val" id="catHeroTotal">—</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
@@ -1778,8 +1778,13 @@ const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov'
 
 function parseBRL(str) {
   if (!str) return 0;
-  const s = String(str).trim().replace(/\s/g, '');
-  return Math.abs(parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0);
+  // Remove prefixo R$, espaços e qualquer símbolo não numérico exceto vírgula e ponto
+  let s = String(str).trim();
+  s = s.replace(/R\u0024/g, '').replace(/\s/g, ''); // remove R$ e espaços
+  s = s.replace(/\.(?=\d{3})/g, '');  // remove pontos de milhar (ex: 1.039 → 1039)
+  s = s.replace(',', '.');             // vírgula decimal → ponto
+  s = s.replace(/[^0-9.]/g, '');      // remove qualquer outro caractere restante
+  return Math.abs(parseFloat(s) || 0);
 }
 
 function parseDate(str) {
@@ -2082,8 +2087,11 @@ function renderSegmentacaoEDatalhes() {
     const d = parseDate(r.data);
     if (!d) return;
     if (d.getFullYear() === currentYear && FILTRO_MESES_SELECIONADOS.includes(d.getMonth())) {
-      if (r.tipo === 'receita') localRec[r.forma] = (localRec[r.forma] || 0) + r.valor;
-      else localDesp[r.categoria] = (localDesp[r.categoria] || 0) + r.valor;
+      const macro = (r.categoriaMacro && !CAT_MACRO_BLOCKLIST.has(r.categoriaMacro.toLowerCase().trim()))
+        ? r.categoriaMacro
+        : getCatGroup(r.categoria);
+      if (r.tipo === 'receita') localRec[macro] = (localRec[macro] || 0) + r.valor;
+      else localDesp[macro] = (localDesp[macro] || 0) + r.valor;
     }
   });
 
@@ -2097,13 +2105,15 @@ function renderSegmentacaoEDatalhes() {
   } else {
     rLegend.innerHTML = '';
     const lbls = [], vals = [];
-    arrRec.forEach(([forma, val], i) => {
-      lbls.push(forma); vals.push(val);
+    arrRec.forEach(([cat, val], i) => {
+      lbls.push(cat); vals.push(val);
       const cor = C_REC[i % C_REC.length];
+      const safecat = escapeHTML(cat).replace(/'/g,"\\'");
       rLegend.innerHTML += `
-        <div class="legend-item">
+        <div class="legend-item" onclick="irParaLancamentosCategoria('${safecat}', true)"
+          style="cursor:pointer" title="Ver lançamentos de ${escapeHTML(cat)}">
           <div class="legend-dot" style="background:${cor}"></div>
-          <div class="legend-name">${escapeHTML(forma)}</div>
+          <div class="legend-name">${escapeHTML(cat)}</div>
           <div class="legend-val">${money(val)}</div>
         </div>`;
     });
@@ -4737,6 +4747,10 @@ function renderAbaCategorias() {
   const totalDesp = rows.filter(r => r.tipo === 'despesa').reduce((s, r) => s + r.valor, 0);
   const totalRec  = rows.filter(r => r.tipo === 'receita').reduce((s, r) => s + r.valor, 0);
   const heroVal   = catTipo === 'receita' ? totalRec : catTipo === 'ambos' ? (totalRec - totalDesp) : totalDesp;
+  const heroLblMap = { despesa: '💸 Total gasto no período', receita: '💰 Total recebido no período', ambos: '⇅ Saldo do período' };
+  const heroLblEl = document.getElementById('catHeroLbl');
+  if (heroLblEl) heroLblEl.textContent = heroLblMap[catTipo];
+
   const heroLbl   = document.getElementById('catPeriodSub');
   const labelMap  = { despesa: `gasto em ${nomeMesLongo} de ${anoStr}`, receita: `recebido em ${nomeMesLongo} de ${anoStr}`, ambos: `saldo em ${nomeMesLongo} de ${anoStr}` };
   if (heroLbl) heroLbl.textContent = labelMap[catTipo];
